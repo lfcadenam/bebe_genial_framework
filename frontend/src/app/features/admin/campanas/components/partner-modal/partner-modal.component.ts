@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminApiCampanasService, ApiPartner, CreatePartnerPayload } from '../../../../../core/services/admin-api-campanas.service';
 
 @Component({
   selector: 'app-partner-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './partner-modal.component.html',
 })
 export class PartnerModalComponent {

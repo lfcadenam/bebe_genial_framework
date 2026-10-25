@@ -22,6 +22,8 @@ describe('UsuariosComponent', () => {
     }).compileComponents();
 
     usersService = TestBed.inject(AdminUsersService);
+    spyOn(usersService, 'getUsers').and.returnValue(of({ data: [], meta: { current_page: 1, last_page: 1, total: 0 } } as any));
+    spyOn(usersService, 'getCourses').and.returnValue(of({ success: true, data: [] }));
     fixture = TestBed.createComponent(UsuariosComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

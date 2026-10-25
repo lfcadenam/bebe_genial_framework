@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminAcademicService, PadresContenidoItem } from '../../../core/services/admin-academic.service';
 import { ContentModalComponent } from './components/content-modal/content-modal.component';
@@ -7,7 +7,7 @@ import { ContentModalComponent } from './components/content-modal/content-modal.
 @Component({
   selector: 'app-smart-cards',
   standalone: true,
-  imports: [CommonModule, FormsModule, ContentModalComponent],
+  imports: [FormsModule, ContentModalComponent],
   templateUrl: './smart-cards.component.html',
 })
 export class SmartCardsComponent implements OnInit {

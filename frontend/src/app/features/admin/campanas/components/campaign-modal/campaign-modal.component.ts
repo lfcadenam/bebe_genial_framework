@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminApiCampanasService, ApiPartner, Campaign, CreateCampaignPayload } from '../../../../../core/services/admin-api-campanas.service';
 import { AdminCourse, AdminUsersService } from '../../../../../core/services/admin-users.service';
@@ -7,7 +7,7 @@ import { AdminCourse, AdminUsersService } from '../../../../../core/services/adm
 @Component({
   selector: 'app-campaign-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './campaign-modal.component.html',
 })
 export class CampaignModalComponent {

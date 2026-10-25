@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminAcademicService } from '../../../../../core/services/admin-academic.service';
 import { AdminUsersService, AdminCourse } from '../../../../../core/services/admin-users.service';
@@ -7,7 +7,7 @@ import { AdminUsersService, AdminCourse } from '../../../../../core/services/adm
 @Component({
   selector: 'app-certificate-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './certificate-modal.component.html',
 })
 export class CertificateModalComponent implements OnInit {

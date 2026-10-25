@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminAcademicService, CourseCatalogItem } from '../../../../../core/services/admin-academic.service';
 
 @Component({
   selector: 'app-course-drawer',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './course-drawer.component.html',
 })
 export class CourseDrawerComponent {

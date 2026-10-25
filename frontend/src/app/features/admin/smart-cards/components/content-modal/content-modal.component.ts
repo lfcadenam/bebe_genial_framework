@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminAcademicService, PadresContenidoItem } from '../../../../../core/services/admin-academic.service';
 
 @Component({
   selector: 'app-content-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './content-modal.component.html',
 })
 export class ContentModalComponent {

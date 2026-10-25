@@ -1,6 +1,6 @@
 # 👶 Ecosistema Bebé Genial — Documentación de Migración y Modernización
 
-Bienvenido al repositorio central de planificación técnica y arquitectura para la modernización de la plataforma **Bebé Genial**, migrando desde el monolito procedural en PHP hacia un stack desacoplado de alto rendimiento: **Laravel 11+ (Backend)** y **Angular 18/19+ (Frontend)**.
+Bienvenido al repositorio central de planificación técnica y arquitectura para la modernización de la plataforma **Bebé Genial**, migrando desde el monolito procedural en PHP hacia un stack desacoplado de alto rendimiento: **Laravel 11+ (Backend)** y **Angular 21+ (Frontend)**.
 
 ---
 
@@ -23,4 +23,4 @@ Los siguientes documentos detallan el análisis, la arquitectura y el plan de ej
 ## 🎯 Resumen de la Fase 1 (Objetivo Inmediato)
 
 * **Meta:** Desacoplar el 100% de la lógica de negocio del monolito legacy hacia un API RESTful en **Laravel 11**.
-* **Resultado Esperado:** Un backend robusto, escalable y documentado (OpenAPI / Swagger) listo para alimentar las aplicaciones cliente en **Angular 18/19** (Portal del Alumno, Portal de Distribuidores y Backoffice Administrativo Nuvex Modern Curve UI).
+* **Resultado Esperado:** Un backend robusto, escalable y documentado (OpenAPI / Swagger) listo para alimentar las aplicaciones cliente en **Angular 21** (Portal del Alumno, Portal de Distribuidores y Backoffice Administrativo Nuvex Modern Curve UI).

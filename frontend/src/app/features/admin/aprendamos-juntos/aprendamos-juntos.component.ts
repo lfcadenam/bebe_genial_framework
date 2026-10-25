@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminAcademicService, PadresContenidoItem } from '../../../core/services/admin-academic.service';
 import { ContentModalComponent } from '../smart-cards/components/content-modal/content-modal.component';
@@ -7,7 +7,7 @@ import { ContentModalComponent } from '../smart-cards/components/content-modal/c
 @Component({
   selector: 'app-aprendamos-juntos',
   standalone: true,
-  imports: [CommonModule, FormsModule, ContentModalComponent],
+  imports: [FormsModule, ContentModalComponent],
   templateUrl: './aprendamos-juntos.component.html',
 })
 export class AprendamosJuntosComponent implements OnInit {

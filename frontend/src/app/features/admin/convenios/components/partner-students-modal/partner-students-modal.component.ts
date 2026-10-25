@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminCommercialService, CommercialPartner } from '../../../../../core/services/admin-commercial.service';
 
 @Component({
   selector: 'app-partner-students-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './partner-students-modal.component.html',
 })
 export class PartnerStudentsModalComponent {

@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AdminAcademicService, EmailTemplateItem } from '../../../../../core/services/admin-academic.service';
 
 @Component({
   selector: 'app-template-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './template-modal.component.html',
 })
 export class TemplateModalComponent {

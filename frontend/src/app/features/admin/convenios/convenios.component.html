@@ -26,7 +26,7 @@
         type="button"
         (click)="openNewPartner()"
         class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/25 active:scale-95 transition-all cursor-pointer"
-      >
+        >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
@@ -38,7 +38,7 @@
         (click)="loadPartners()"
         class="inline-flex items-center gap-2 p-2.5 rounded-full text-slate-500 hover:text-slate-800 bg-slate-50 hover:bg-slate-100 border border-slate-200 active:scale-95 transition-all cursor-pointer"
         title="Refrescar listado"
-      >
+        >
         <svg class="w-4 h-4" [class.animate-spin]="commercialService.isLoading()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
@@ -47,19 +47,21 @@
   </div>
 
   <!-- Flash Toast de Éxito -->
-  <div *ngIf="flashMessage()" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-between animate-in fade-in duration-200">
-    <div class="flex items-center gap-2">
-      <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-      </svg>
-      <span>{{ flashMessage() }}</span>
+  @if (flashMessage()) {
+    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-between animate-in fade-in duration-200">
+      <div class="flex items-center gap-2">
+        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>{{ flashMessage() }}</span>
+      </div>
+      <button (click)="flashMessage.set(null)" class="text-emerald-700 hover:text-emerald-900 text-xs font-bold">×</button>
     </div>
-    <button (click)="flashMessage.set(null)" class="text-emerald-700 hover:text-emerald-900 text-xs font-bold">×</button>
-  </div>
+  }
 
   <!-- ==================== FILA DE KPIS COMERCIALES ==================== -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-    
+
     <div class="bg-white rounded-[28px] p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
       <div>
         <p class="text-xs font-semibold text-slate-500">Total Entidades</p>
@@ -125,7 +127,7 @@
   <!-- ==================== BARRA DE BÚSQUEDA Y FILTROS TIPO PÍLDORA ==================== -->
   <div class="bg-white rounded-[28px] p-4 sm:p-5 shadow-xs border border-slate-200/80 space-y-4">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      
+
       <!-- Buscador en Vivo -->
       <div class="relative flex-1 max-w-lg">
         <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -137,7 +139,7 @@
           (ngModelChange)="onSearchChange($event)"
           placeholder="Buscar por razón social, contacto o correo..."
           class="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-full bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
-        />
+          />
       </div>
 
       <!-- Filtros por Tipo -->
@@ -148,7 +150,7 @@
           (click)="setTypeFilter('')"
           class="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
           [ngClass]="typeFilter() === '' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-        >
+          >
           Todos
         </button>
         <button
@@ -156,7 +158,7 @@
           (click)="setTypeFilter('agreement')"
           class="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
           [ngClass]="typeFilter() === 'agreement' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-        >
+          >
           Convenios
         </button>
         <button
@@ -164,7 +166,7 @@
           (click)="setTypeFilter('distributor')"
           class="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
           [ngClass]="typeFilter() === 'distributor' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-        >
+          >
           Distribuidores
         </button>
       </div>
@@ -179,7 +181,7 @@
         (click)="setStatusFilter('')"
         class="px-3 py-1 rounded-full font-bold transition-all cursor-pointer"
         [ngClass]="statusFilter() === '' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-      >
+        >
         Todos
       </button>
       <button
@@ -187,7 +189,7 @@
         (click)="setStatusFilter('active')"
         class="px-3 py-1 rounded-full font-bold transition-all cursor-pointer"
         [ngClass]="statusFilter() === 'active' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-      >
+        >
         Activos
       </button>
       <button
@@ -195,7 +197,7 @@
         (click)="setStatusFilter('inactive')"
         class="px-3 py-1 rounded-full font-bold transition-all cursor-pointer"
         [ngClass]="statusFilter() === 'inactive' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-      >
+        >
         Inactivos
       </button>
     </div>
@@ -203,7 +205,7 @@
 
   <!-- ==================== TABLA ELEVADA SUAVE (Nuvex Modern Curve UI) ==================== -->
   <div class="bg-white rounded-[32px] p-6 shadow-xs border border-slate-200/80 overflow-hidden">
-    
+
     <div class="overflow-x-auto">
       <table class="w-full text-left border-collapse">
         <thead>
@@ -217,120 +219,121 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 text-xs">
-          
-          <tr *ngIf="commercialService.isLoading()">
-            <td colspan="6" class="py-8 text-center text-slate-400">
-              <div class="inline-flex items-center gap-2">
-                <svg class="w-4 h-4 animate-spin text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
-                <span>Cargando aliados comerciales...</span>
-              </div>
-            </td>
-          </tr>
 
-          <tr *ngIf="!commercialService.isLoading() && !commercialService.partners().length">
-            <td colspan="6" class="py-8 text-center text-slate-400">
-              No se encontraron aliados comerciales que coincidan con la búsqueda.
-            </td>
-          </tr>
-
-          <tr
-            *ngFor="let p of commercialService.partners()"
-            class="hover:bg-slate-50/80 transition-colors group"
-          >
-            <!-- Razón Social y Tipo -->
-            <td class="py-3.5 px-3">
-              <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 font-extrabold flex items-center justify-center shrink-0 text-xs shadow-xs">
-                  {{ p.company_name.charAt(0) }}
+          @if (commercialService.isLoading()) {
+            <tr>
+              <td colspan="6" class="py-8 text-center text-slate-400">
+                <div class="inline-flex items-center gap-2">
+                  <svg class="w-4 h-4 animate-spin text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Cargando aliados comerciales...</span>
                 </div>
-                <div class="min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span class="block font-bold text-slate-900 truncate">{{ p.company_name }}</span>
-                    <span
-                      class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0"
-                      [ngClass]="p.is_agreement ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : 'bg-slate-100 text-slate-700'"
-                    >
-                      {{ p.is_agreement ? 'Convenio' : 'Distribuidor' }}
-                    </span>
+              </td>
+            </tr>
+          }
+
+          @if (!commercialService.isLoading() && !commercialService.partners().length) {
+            <tr>
+              <td colspan="6" class="py-8 text-center text-slate-400">
+                No se encontraron aliados comerciales que coincidan con la búsqueda.
+              </td>
+            </tr>
+          }
+
+          @for (p of commercialService.partners(); track p) {
+            <tr
+              class="hover:bg-slate-50/80 transition-colors group"
+              >
+              <!-- Razón Social y Tipo -->
+              <td class="py-3.5 px-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 font-extrabold flex items-center justify-center shrink-0 text-xs shadow-xs">
+                    {{ p.company_name.charAt(0) }}
                   </div>
-                  <span *ngIf="p.notes" class="block text-[11px] text-slate-400 truncate max-w-xs">{{ p.notes }}</span>
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2">
+                      <span class="block font-bold text-slate-900 truncate">{{ p.company_name }}</span>
+                      <span
+                        class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0"
+                        [ngClass]="p.is_agreement ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : 'bg-slate-100 text-slate-700'"
+                        >
+                        {{ p.is_agreement ? 'Convenio' : 'Distribuidor' }}
+                      </span>
+                    </div>
+                    @if (p.notes) {
+                      <span class="block text-[11px] text-slate-400 truncate max-w-xs">{{ p.notes }}</span>
+                    }
+                  </div>
                 </div>
-              </div>
-            </td>
-
-            <!-- Contacto -->
-            <td class="py-3.5 px-3">
-              <span class="block font-semibold text-slate-800 truncate">{{ p.contact_name }}</span>
-              <span class="block text-[11px] text-slate-400 truncate">{{ p.contact_email }}</span>
-              <span *ngIf="p.contact_phone" class="block text-[11px] text-slate-400 font-mono">{{ p.contact_phone }}</span>
-            </td>
-
-            <!-- Cursos y Vigencia -->
-            <td class="py-3.5 px-3">
-              <span class="block font-semibold text-slate-800">
-                {{ p.allowed_courses?.length || 0 }} cursos autorizados
-              </span>
-              <span class="block text-[11px] text-emerald-600 font-semibold">
-                {{ p.allowed_months }} meses de acceso
-              </span>
-            </td>
-
-            <!-- Alumnos Vinculados -->
-            <td class="py-3.5 px-3">
-              <button
-                type="button"
-                (click)="openStudentsModal(p)"
-                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 transition-colors cursor-pointer"
-                title="Ver alumnos registrados"
-              >
-                <span>{{ p.students_count || 0 }} alumnos</span>
-                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </td>
-
-            <!-- Estado -->
-            <td class="py-3.5 px-3">
-              <span
-                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                [ngClass]="p.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100'"
-              >
-                {{ p.status }}
-              </span>
-            </td>
-
-            <!-- Acciones -->
-            <td class="py-3.5 px-3 text-right">
-              <div class="flex items-center justify-end gap-1">
-                
+              </td>
+              <!-- Contacto -->
+              <td class="py-3.5 px-3">
+                <span class="block font-semibold text-slate-800 truncate">{{ p.contact_name }}</span>
+                <span class="block text-[11px] text-slate-400 truncate">{{ p.contact_email }}</span>
+                @if (p.contact_phone) {
+                  <span class="block text-[11px] text-slate-400 font-mono">{{ p.contact_phone }}</span>
+                }
+              </td>
+              <!-- Cursos y Vigencia -->
+              <td class="py-3.5 px-3">
+                <span class="block font-semibold text-slate-800">
+                  {{ p.allowed_courses?.length || 0 }} cursos autorizados
+                </span>
+                <span class="block text-[11px] text-emerald-600 font-semibold">
+                  {{ p.allowed_months }} meses de acceso
+                </span>
+              </td>
+              <!-- Alumnos Vinculados -->
+              <td class="py-3.5 px-3">
                 <button
                   type="button"
-                  (click)="openEditPartner(p)"
-                  title="Editar parámetros del aliado"
-                  class="p-2 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  (click)="openStudentsModal(p)"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 transition-colors cursor-pointer"
+                  title="Ver alumnos registrados"
+                  >
+                  <span>{{ p.students_count || 0 }} alumnos</span>
+                  <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                   </svg>
                 </button>
-
-                <button
-                  type="button"
-                  (click)="onDeletePartner(p)"
-                  title="Eliminar aliado"
-                  class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                >
-                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-
-              </div>
-            </td>
-          </tr>
+              </td>
+              <!-- Estado -->
+              <td class="py-3.5 px-3">
+                <span
+                  class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                  [ngClass]="p.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100'"
+                  >
+                  {{ p.status }}
+                </span>
+              </td>
+              <!-- Acciones -->
+              <td class="py-3.5 px-3 text-right">
+                <div class="flex items-center justify-end gap-1">
+                  <button
+                    type="button"
+                    (click)="openEditPartner(p)"
+                    title="Editar parámetros del aliado"
+                    class="p-2 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
+                    >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    (click)="onDeletePartner(p)"
+                    title="Eliminar aliado"
+                    class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                    >
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
 
         </tbody>
       </table>
@@ -349,7 +352,7 @@
           (click)="onPageChange(currentPage() - 1)"
           [disabled]="currentPage() <= 1"
           class="px-3.5 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-semibold"
-        >
+          >
           Anterior
         </button>
 
@@ -362,7 +365,7 @@
           (click)="onPageChange(currentPage() + 1)"
           [disabled]="currentPage() >= commercialService.partnersMeta().last_page"
           class="px-3.5 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-semibold"
-        >
+          >
           Siguiente
         </button>
       </div>

@@ -40,10 +40,12 @@ describe('CampanasComponent', () => {
     expect(component.activeTab()).toBe('campanas');
     expect(component.loadCampaigns).toHaveBeenCalled();
 
+    spyOn(component, 'loadAuditMetrics');
     spyOn(component, 'loadAuditLogs');
     component.setTab('auditoria');
     expect(component.activeTab()).toBe('auditoria');
     expect(component.loadAuditLogs).toHaveBeenCalled();
+    expect(component.loadAuditMetrics).toHaveBeenCalled();
   });
 
   it('should open and close partner modal', () => {

@@ -180,3 +180,21 @@ Todos los 5 Sprints planificados para la migración del backoffice del administr
 5. **Sprint 5:** Catálogo Académico, Smart Cards, Zona Padres, Trials, OmniSearch y Diplomas.
 
 *Toda la suite de pruebas del backend (40/40) y del frontend (52/52) se encuentra 100% en verde y la interfaz opera estrictamente bajo el estándar Nuvex Modern Curve UI en modo claro puro.*
+
+---
+
+## ⚡ 8. Modernización del Frontend a Angular 21 (LTS Moderno)
+
+Se completó con éxito la migración escalonada del frontend desde **Angular 19** hacia **Angular 21** (`@angular/core@21.2.25` y `@angular/cli@21.2.28`):
+
+1. **Ruta Escalonada Oficial:**
+   * **Paso 1:** Salto a Angular 20 (`v20.3.34`) con schematics automáticos de tipado y componentes Standalone.
+   * **Paso 2:** Salto a Angular 21 (`v21.2.25`) y `@angular-devkit/build-angular@21.2.28`.
+2. **Optimizaciones de Compilación y Rendimiento:**
+   * Tiempo de compilación de bundle de producción reducido de **10.7s a 6.1s** (mejora del ~43%).
+   * Arquitectura basada en *Application Builder* nativo (esbuild/Vite) con Tailwind CSS v4.
+3. **Estabilidad de Testing y Entorno Seguro (`src/test.ts`):**
+   * Configuración de inicialización del entorno de pruebas (`initTestEnvironment`) con teardown controlado para evitar fugas de suscripciones asíncronas en Karma.
+   * Nuevo script de ejecución única sin modo escucha: `npm run test:ci`.
+   * **Métricas Finales en Angular 21:** **52 de 52 pruebas unitarias exitosas (100% Green)** en **0.99 segundos**.
+
