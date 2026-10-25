@@ -1,0 +1,177 @@
+<div class="space-y-6">
+  <!-- Encabezado de Página -->
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-black text-slate-900 tracking-tight">Diplomas & Certificados Oficiales</h1>
+      <p class="text-xs text-slate-500 font-medium mt-1">
+        Acreditación pedagógica de logros de los bebés y culminación de programas de estimulación temprana.
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button
+        type="button"
+        (click)="openModal()"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs shadow-lg shadow-emerald-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Emitir Diploma Oficial</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Barra de Filtros y Búsqueda -->
+  <div class="bg-white p-4 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row gap-3 items-center justify-between">
+    <div class="relative w-full sm:w-80">
+      <input
+        type="text"
+        [ngModel]="search()"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Buscar por código de certificado o usuario..."
+        class="w-full pl-10 pr-4 py-2 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+      />
+      <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+      <select
+        [ngModel]="selectedStatus()"
+        (ngModelChange)="onStatusChange($event)"
+        class="px-3.5 py-2 rounded-2xl border border-slate-200 text-xs text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white"
+      >
+        <option value="">Todos los Estados</option>
+        <option value="valid">Válidos</option>
+        <option value="revoked">Revocados</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Contenedor Principal: Tabla de Certificados -->
+  <div class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+    @if (academicService.isLoading()) {
+      <div class="py-20 flex flex-col items-center justify-center text-slate-400 gap-3">
+        <svg class="animate-spin w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        </svg>
+        <p class="text-xs font-semibold text-slate-500">Cargando diplomas emitidos...</p>
+      </div>
+    } @else if (academicService.certificates().length === 0) {
+      <div class="py-20 flex flex-col items-center justify-center text-slate-400 gap-2">
+        <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400">
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+          </svg>
+        </div>
+        <p class="text-xs font-semibold text-slate-600">No hay certificados registrados</p>
+        <p class="text-[11px] text-slate-400">Haz clic en "Emitir Diploma Oficial" para acreditar a un estudiante.</p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-100 bg-slate-50/50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+              <th class="py-3.5 px-6">Código Oficial</th>
+              <th class="py-3.5 px-6">Graduado / Titular</th>
+              <th class="py-3.5 px-6">Curso Pedagógico</th>
+              <th class="py-3.5 px-6">Mención</th>
+              <th class="py-3.5 px-6">Fecha Emisión</th>
+              <th class="py-3.5 px-6">Estado</th>
+              <th class="py-3.5 px-6 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-xs">
+            @for (cert of academicService.certificates(); track cert.id) {
+              <tr class="hover:bg-slate-50/60 transition-colors">
+                <td class="py-4 px-6">
+                  <span class="font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-100 text-[11px]">
+                    {{ cert.certificate_code }}
+                  </span>
+                </td>
+                <td class="py-4 px-6">
+                  <div class="font-bold text-slate-900">{{ cert.user?.full_name || cert.user?.name || 'Usuario #' + cert.user_id }}</div>
+                  <div class="text-[11px] text-slate-400">{{ cert.user?.email || 'Sin correo' }}</div>
+                </td>
+                <td class="py-4 px-6">
+                  <span class="font-semibold text-slate-800">{{ cert.course?.title || 'Curso #' + cert.course_id }}</span>
+                </td>
+                <td class="py-4 px-6 text-slate-600">
+                  {{ cert.grade || 'Aprobado' }}
+                </td>
+                <td class="py-4 px-6 text-slate-500">
+                  {{ cert.issued_at | date:'dd/MM/yyyy' }}
+                </td>
+                <td class="py-4 px-6">
+                  @if (cert.status === 'valid') {
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[11px]">
+                      Válido
+                    </span>
+                  } @else {
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[11px]">
+                      Revocado
+                    </span>
+                  }
+                </td>
+                <td class="py-4 px-6 text-right">
+                  @if (cert.status === 'valid') {
+                    <button
+                      type="button"
+                      (click)="revokeCertificate(cert)"
+                      class="px-3 py-1.5 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-semibold transition-colors"
+                      title="Revocar Diploma"
+                    >
+                      Revocar
+                    </button>
+                  } @else {
+                    <span class="text-slate-300 text-[11px] font-medium">—</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      @if (academicService.certificatesMeta().last_page > 1) {
+        <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+          <p class="text-xs text-slate-500 font-medium">
+            Total de registros: <span class="font-bold text-slate-800">{{ academicService.certificatesMeta().total }}</span>
+          </p>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              [disabled]="currentPage() === 1"
+              (click)="loadCertificates(currentPage() - 1)"
+              class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-40 transition-colors"
+            >
+              Anterior
+            </button>
+            <span class="text-xs font-bold text-slate-700 px-2">
+              {{ currentPage() }} de {{ academicService.certificatesMeta().last_page }}
+            </span>
+            <button
+              type="button"
+              [disabled]="currentPage() === academicService.certificatesMeta().last_page"
+              (click)="loadCertificates(currentPage() + 1)"
+              class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 disabled:opacity-40 transition-colors"
+            >
+              Siguiente
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Modal de Emisión de Diploma -->
+  <app-certificate-modal
+    [isOpen]="isModalOpen()"
+    (close)="closeModal()"
+    (certificateEmitted)="loadCertificates(currentPage())"
+  ></app-certificate-modal>
+</div>

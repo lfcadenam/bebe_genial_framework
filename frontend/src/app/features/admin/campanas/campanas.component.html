@@ -1,0 +1,707 @@
+<div class="space-y-6">
+
+  <!-- ==================== TOAST FLASH ==================== -->
+  @if (flashMessage()) {
+    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-between shadow-xs animate-in fade-in slide-in-from-top-2">
+      <div class="flex items-center gap-2.5">
+        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span>{{ flashMessage() }}</span>
+      </div>
+      <button (click)="flashMessage.set(null)" class="text-emerald-500 hover:text-emerald-700">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  }
+
+  <!-- ==================== CABECERA CON PESTAÑAS ==================== -->
+  <div class="bg-white rounded-[32px] p-6 lg:p-8 shadow-xs border border-slate-200/80">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">
+          <span>Ecosistema B2B</span>
+          <span class="text-slate-300">&bull;</span>
+          <span>API Externa</span>
+        </div>
+        <h1 class="text-2xl font-black tracking-tight text-slate-900">API Leo con LEO & Campañas</h1>
+        <p class="text-xs text-slate-500 font-medium mt-0.5">
+          Gestión de aliados estratégicos, cuotas de lectura por campaña y auditoría técnica de solicitudes.
+        </p>
+      </div>
+
+      <!-- Selector de Pestañas Tipo Píldora -->
+      <div class="flex items-center p-1.5 bg-slate-100 rounded-2xl self-start md:self-auto">
+        <button
+          type="button"
+          (click)="setTab('aliados')"
+          [class.bg-white]="activeTab() === 'aliados'"
+          [class.text-slate-900]="activeTab() === 'aliados'"
+          [class.shadow-xs]="activeTab() === 'aliados'"
+          [class.text-slate-500]="activeTab() !== 'aliados'"
+          class="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-150 flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          <span>Aliados / Orígenes API</span>
+        </button>
+
+        <button
+          type="button"
+          (click)="setTab('campanas')"
+          [class.bg-white]="activeTab() === 'campanas'"
+          [class.text-slate-900]="activeTab() === 'campanas'"
+          [class.shadow-xs]="activeTab() === 'campanas'"
+          [class.text-slate-500]="activeTab() !== 'campanas'"
+          class="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-150 flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span>Campañas & Cuotas</span>
+        </button>
+
+        <button
+          type="button"
+          (click)="setTab('auditoria')"
+          [class.bg-white]="activeTab() === 'auditoria'"
+          [class.text-slate-900]="activeTab() === 'auditoria'"
+          [class.shadow-xs]="activeTab() === 'auditoria'"
+          [class.text-slate-500]="activeTab() !== 'auditoria'"
+          class="px-4 py-2 rounded-xl text-xs font-bold transition-all duration-150 flex items-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>Auditoría de Peticiones</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PESTAÑA 1: ALIADOS / ORÍGENES API ==================== -->
+  @if (activeTab() === 'aliados') {
+    <div class="space-y-4">
+      
+      <!-- Barra de Filtros y Acción -->
+      <div class="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div class="flex flex-1 items-center gap-3 w-full sm:w-auto">
+          <div class="relative flex-1 max-w-sm">
+            <input
+              type="text"
+              [ngModel]="partnerSearch()"
+              (ngModelChange)="onPartnerSearchChange($event)"
+              placeholder="Buscar aliado por nombre, código o correo..."
+              class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          <select
+            [ngModel]="partnerStatusFilter()"
+            (ngModelChange)="setPartnerStatusFilter($event)"
+            class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          >
+            <option value="">Todos los Estados</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
+          </select>
+        </div>
+
+        <button
+          type="button"
+          (click)="openNewPartner()"
+          class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-2 shrink-0"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Nuevo Aliado / Origen API</span>
+        </button>
+      </div>
+
+      <!-- Tabla de Aliados B2B -->
+      <div class="bg-white rounded-3xl shadow-xs border border-slate-200/80 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">
+                <th class="py-4 px-6">Origen / Aliado</th>
+                <th class="py-4 px-6">Código Slug</th>
+                <th class="py-4 px-6">API Key</th>
+                <th class="py-4 px-6 text-center">Campañas</th>
+                <th class="py-4 px-6 text-center">Peticiones</th>
+                <th class="py-4 px-6 text-center">Estado</th>
+                <th class="py-4 px-6 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+              @if (campanasService.partners().length === 0) {
+                <tr>
+                  <td colspan="7" class="py-12 text-center text-slate-400 font-medium">
+                    No se encontraron aliados registrados.
+                  </td>
+                </tr>
+              }
+              @for (p of campanasService.partners(); track p.id) {
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="py-4 px-6">
+                    <div class="flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-700 font-extrabold flex items-center justify-center text-xs">
+                        #{{ p.origin_code }}
+                      </div>
+                      <div>
+                        <span class="font-extrabold text-slate-900 block">{{ p.name }}</span>
+                        <span class="text-[11px] text-slate-400">{{ p.contact_name || p.contact_email || 'Sin contacto directo' }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class="font-mono text-slate-600 bg-slate-100 px-2 py-1 rounded-md text-[11px] font-semibold">{{ p.partner_code }}</span>
+                  </td>
+                  <td class="py-4 px-6">
+                    <div class="flex items-center gap-2">
+                      <span class="font-mono text-slate-500 text-[11px] bg-slate-50 border border-slate-100 px-2 py-1 rounded-md">
+                        {{ p.api_key.substring(0, 16) }}...
+                      </span>
+                      <button
+                        type="button"
+                        (click)="copyApiKey(p.api_key)"
+                        title="Copiar API Key"
+                        class="p-1 rounded-md text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6 text-center font-bold text-slate-800">
+                    {{ p.campaigns_count || 0 }}
+                  </td>
+                  <td class="py-4 px-6 text-center font-bold text-slate-800">
+                    {{ p.audit_logs_count || 0 }}
+                  </td>
+                  <td class="py-4 px-6 text-center">
+                    <button
+                      type="button"
+                      (click)="onTogglePartnerStatus(p)"
+                      class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase transition-all"
+                      [ngClass]="p.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+                    >
+                      {{ p.status === 'active' ? 'Activo' : 'Inactivo' }}
+                    </button>
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <div class="flex items-center justify-end gap-1.5">
+                      <button
+                        type="button"
+                        (click)="onRegenerateKey(p)"
+                        title="Regenerar API Key"
+                        class="p-1.5 rounded-lg text-amber-600 hover:bg-amber-50 transition-colors"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="openEditPartner(p)"
+                        title="Editar Aliado"
+                        class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="onDeletePartner(p)"
+                        title="Eliminar Aliado"
+                        class="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación -->
+        @if (campanasService.partnersMeta().last_page > 1) {
+          <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>
+              Mostrando página {{ campanasService.partnersMeta().current_page }} de {{ campanasService.partnersMeta().last_page }} ({{ campanasService.partnersMeta().total }} aliados)
+            </span>
+            <div class="flex items-center gap-1">
+              <button
+                type="button"
+                [disabled]="partnerPage() <= 1"
+                (click)="onPartnerPageChange(partnerPage() - 1)"
+                class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold disabled:opacity-40 hover:bg-slate-50"
+              >
+                Anterior
+              </button>
+              <button
+                type="button"
+                [disabled]="partnerPage() >= campanasService.partnersMeta().last_page"
+                (click)="onPartnerPageChange(partnerPage() + 1)"
+                class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold disabled:opacity-40 hover:bg-slate-50"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+  <!-- ==================== PESTAÑA 2: CAMPAÑAS & CUOTAS ==================== -->
+  @if (activeTab() === 'campanas') {
+    <div class="space-y-4">
+      
+      <!-- Filtros de Campañas -->
+      <div class="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-3">
+        <div class="flex flex-1 items-center gap-3 w-full md:w-auto flex-wrap sm:flex-nowrap">
+          <div class="relative flex-1 max-w-xs w-full">
+            <input
+              type="text"
+              [ngModel]="campaignSearch()"
+              (ngModelChange)="onCampaignSearchChange($event)"
+              placeholder="Buscar por código o nombre..."
+              class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          <select
+            [ngModel]="campaignPartnerFilter()"
+            (ngModelChange)="setCampaignPartnerFilter($event)"
+            class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          >
+            <option [value]="''">Todos los Aliados</option>
+            @for (p of campanasService.partners(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+
+          <select
+            [ngModel]="campaignStatusFilter()"
+            (ngModelChange)="setCampaignStatusFilter($event)"
+            class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          >
+            <option value="">Todos los Estados</option>
+            <option value="active">Activas</option>
+            <option value="inactive">Pausadas</option>
+          </select>
+        </div>
+
+        <button
+          type="button"
+          (click)="openNewCampaign()"
+          class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-2 shrink-0"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Nueva Campaña B2B</span>
+        </button>
+      </div>
+
+      <!-- Tabla de Campañas -->
+      <div class="bg-white rounded-3xl shadow-xs border border-slate-200/80 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">
+                <th class="py-4 px-6">Código / Campaña</th>
+                <th class="py-4 px-6">Aliado / Origen</th>
+                <th class="py-4 px-6">Curso Pedagógico</th>
+                <th class="py-4 px-6 text-center">Cuota de Libros</th>
+                <th class="py-4 px-6">Vigencia</th>
+                <th class="py-4 px-6 text-center">Matrículas</th>
+                <th class="py-4 px-6 text-center">Estado</th>
+                <th class="py-4 px-6 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+              @if (campanasService.campaigns().length === 0) {
+                <tr>
+                  <td colspan="8" class="py-12 text-center text-slate-400 font-medium">
+                    No se encontraron campañas configuradas.
+                  </td>
+                </tr>
+              }
+              @for (c of campanasService.campaigns(); track c.id) {
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="py-4 px-6">
+                    <span class="font-mono text-xs font-black text-slate-900 block">{{ c.code }}</span>
+                    <span class="text-[11px] text-slate-500">{{ c.name }}</span>
+                  </td>
+                  <td class="py-4 px-6">
+                    @if (c.partner) {
+                      <span class="font-semibold text-slate-800">{{ c.partner.name }}</span>
+                    } @else {
+                      <span class="text-slate-400 italic">General (Sin Aliado)</span>
+                    }
+                  </td>
+                  <td class="py-4 px-6">
+                    <span class="text-slate-700 font-medium">{{ c.course?.title || 'Curso #' + c.course_id }}</span>
+                  </td>
+                  <td class="py-4 px-6 text-center">
+                    @if (c.book_limit === 0) {
+                      <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Ilimitado
+                      </span>
+                    } @else {
+                      <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        {{ c.book_limit }} libros
+                      </span>
+                    }
+                  </td>
+                  <td class="py-4 px-6">
+                    <div class="text-[11px] text-slate-600">
+                      <span class="font-medium">{{ c.starts_at | date:'dd/MM/yyyy' }}</span> al <span class="font-medium">{{ c.ends_at | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                    <small class="text-slate-400 text-[10px]">{{ c.duration_days }} días de acceso</small>
+                  </td>
+                  <td class="py-4 px-6 text-center font-bold text-slate-800">
+                    {{ c.enrollments_count || 0 }}
+                  </td>
+                  <td class="py-4 px-6 text-center">
+                    <button
+                      type="button"
+                      (click)="onToggleCampaignStatus(c)"
+                      class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase transition-all"
+                      [ngClass]="c.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'"
+                    >
+                      {{ c.is_active ? 'Activa' : 'Pausada' }}
+                    </button>
+                  </td>
+                  <td class="py-4 px-6 text-right">
+                    <div class="flex items-center justify-end gap-1.5">
+                      <button
+                        type="button"
+                        (click)="openEditCampaign(c)"
+                        title="Editar Campaña"
+                        class="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        (click)="onDeleteCampaign(c)"
+                        title="Eliminar Campaña"
+                        class="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación Campañas -->
+        @if (campanasService.campaignsMeta().last_page > 1) {
+          <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>
+              Página {{ campanasService.campaignsMeta().current_page }} de {{ campanasService.campaignsMeta().last_page }} ({{ campanasService.campaignsMeta().total }} campañas)
+            </span>
+            <div class="flex items-center gap-1">
+              <button
+                type="button"
+                [disabled]="campaignPage() <= 1"
+                (click)="onCampaignPageChange(campaignPage() - 1)"
+                class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold disabled:opacity-40 hover:bg-slate-50"
+              >
+                Anterior
+              </button>
+              <button
+                type="button"
+                [disabled]="campaignPage() >= campanasService.campaignsMeta().last_page"
+                (click)="onCampaignPageChange(campaignPage() + 1)"
+                class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold disabled:opacity-40 hover:bg-slate-50"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+  <!-- ==================== PESTAÑA 3: AUDITORÍA DE PETICIONES ==================== -->
+  @if (activeTab() === 'auditoria') {
+    <div class="space-y-6">
+
+      <!-- 4 KPI Stat Cards -->
+      @if (campanasService.auditMetrics()) {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <div class="bg-white rounded-3xl p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+            <div>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Peticiones</p>
+              <h3 class="text-2xl font-black text-slate-900 tracking-tight">
+                {{ campanasService.auditMetrics()?.total_requests | number }}
+              </h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200/70 text-slate-600 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+            <div>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Exitosas (200 / 201)</p>
+              <h3 class="text-2xl font-black text-emerald-600 tracking-tight">
+                {{ campanasService.auditMetrics()?.total_successful | number }}
+              </h3>
+              <span class="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded-md mt-1 inline-block">
+                {{ campanasService.auditMetrics()?.success_rate }}% Tasa de Éxito
+              </span>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+            <div>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Validación (400)</p>
+              <h3 class="text-2xl font-black text-amber-600 tracking-tight">
+                {{ campanasService.auditMetrics()?.total_validation | number }}
+              </h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+            <div>
+              <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Rechazos (401 / 422 / 500)</p>
+              <h3 class="text-2xl font-black text-rose-600 tracking-tight">
+                {{ campanasService.auditMetrics()?.total_rejected | number }}
+              </h3>
+            </div>
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            </div>
+          </div>
+
+        </div>
+      }
+
+      <!-- Filtros de Auditoría -->
+      <div class="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 flex flex-col md:flex-row items-center justify-between gap-3">
+        <div class="flex flex-1 items-center gap-3 w-full md:w-auto flex-wrap sm:flex-nowrap">
+          <div class="relative flex-1 max-w-xs w-full">
+            <input
+              type="text"
+              [ngModel]="auditSearch()"
+              (ngModelChange)="onAuditSearchChange($event)"
+              placeholder="Buscar por correo o campaña..."
+              class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+
+          <select
+            [ngModel]="auditPartnerFilter()"
+            (ngModelChange)="setAuditPartnerFilter($event)"
+            class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          >
+            <option [value]="''">Todos los Aliados</option>
+            @for (p of campanasService.partners(); track p.id) {
+              <option [value]="p.id">{{ p.name }}</option>
+            }
+          </select>
+
+          <select
+            [ngModel]="auditStatusGroupFilter()"
+            (ngModelChange)="setAuditStatusFilter($event)"
+            class="px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+          >
+            <option value="">Todos los Estados HTTP</option>
+            <option value="success">Exitosas (200 / 201)</option>
+            <option value="validation">Validación (400)</option>
+            <option value="error">Rechazos (401 / 422 / 500)</option>
+          </select>
+        </div>
+
+        <button
+          type="button"
+          (click)="loadAuditLogs()"
+          class="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-semibold text-xs transition-all flex items-center gap-2 shrink-0"
+        >
+          <svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>Refrescar Logs</span>
+        </button>
+      </div>
+
+      <!-- Tabla de Logs de Auditoría -->
+      <div class="bg-white rounded-3xl shadow-xs border border-slate-200/80 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50">
+                <th class="py-4 px-6">Fecha / Hora</th>
+                <th class="py-4 px-6 text-center">Status</th>
+                <th class="py-4 px-6">Aliado / Origen</th>
+                <th class="py-4 px-6">Campaña</th>
+                <th class="py-4 px-6">Correo Solicitado</th>
+                <th class="py-4 px-6">IP Origen</th>
+                <th class="py-4 px-6 text-right">Detalle</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
+              @if (campanasService.auditLogs().length === 0) {
+                <tr>
+                  <td colspan="7" class="py-12 text-center text-slate-400 font-medium">
+                    No se registran eventos de auditoría bajo los filtros seleccionados.
+                  </td>
+                </tr>
+              }
+              @for (l of campanasService.auditLogs(); track l.id) {
+                <tr class="hover:bg-slate-50/60 transition-colors">
+                  <td class="py-4 px-6 whitespace-nowrap">
+                    <span class="font-extrabold text-slate-900 block">{{ l.created_at | date:'dd/MM/yyyy' }}</span>
+                    <span class="text-[11px] text-slate-400 font-mono">{{ l.created_at | date:'HH:mm:ss' }}</span>
+                  </td>
+                  <td class="py-4 px-6 text-center whitespace-nowrap">
+                    <span
+                      class="px-2.5 py-1 rounded-full text-[10px] font-mono font-extrabold"
+                      [ngClass]="{
+                        'bg-emerald-50 text-emerald-700 border border-emerald-200': l.http_status >= 200 && l.http_status < 300,
+                        'bg-amber-50 text-amber-700 border border-amber-200': l.http_status === 400,
+                        'bg-rose-50 text-rose-700 border border-rose-200': l.http_status >= 401
+                      }"
+                    >
+                      {{ l.http_status }}
+                    </span>
+                  </td>
+                  <td class="py-4 px-6">
+                    @if (l.partner) {
+                      <span class="font-bold text-slate-900 block">{{ l.partner.name }}</span>
+                      <small class="text-slate-400 text-[10px]">Origen #{{ l.partner.origin_code }}</small>
+                    } @else {
+                      <span class="text-slate-400 italic">No autenticado</span>
+                    }
+                  </td>
+                  <td class="py-4 px-6">
+                    @if (l.campaign_code) {
+                      <span class="font-mono text-slate-700 bg-slate-100 px-2 py-0.5 rounded text-[11px] font-semibold">{{ l.campaign_code }}</span>
+                    } @else {
+                      <span class="text-slate-400">&mdash;</span>
+                    }
+                  </td>
+                  <td class="py-4 px-6 font-medium text-slate-800">
+                    {{ l.requested_email || 'N/D' }}
+                  </td>
+                  <td class="py-4 px-6 font-mono text-slate-500 text-[11px]">
+                    {{ l.ip_address }}
+                  </td>
+                  <td class="py-4 px-6 text-right whitespace-nowrap">
+                    <button
+                      type="button"
+                      (click)="openAuditDetail(l)"
+                      class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-[11px] transition-colors"
+                    >
+                      Ver JSON
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginación Auditoría -->
+        @if (campanasService.auditLogsMeta().last_page > 1) {
+          <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>
+              Página {{ campanasService.auditLogsMeta().current_page }} de {{ campanasService.auditLogsMeta().last_page }} ({{ campanasService.auditLogsMeta().total }} peticiones registradas)
+            </span>
+            <div class="flex items-center gap-1">
+              <button
+                type="button"
+                [disabled]="auditPage() <= 1"
+                (click)="onAuditPageChange(auditPage() - 1)"
+                class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold disabled:opacity-40 hover:bg-slate-50"
+              >
+                Anterior
+              </button>
+              <button
+                type="button"
+                [disabled]="auditPage() >= campanasService.auditLogsMeta().last_page"
+                (click)="onAuditPageChange(auditPage() + 1)"
+                class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-semibold disabled:opacity-40 hover:bg-slate-50"
+              >
+                Siguiente
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+    </div>
+  }
+
+</div>
+
+<!-- ==================== MODALES ==================== -->
+<app-partner-modal
+  [isOpen]="isPartnerModalOpen()"
+  [partner]="selectedPartner()"
+  (close)="closePartnerModal()"
+  (partnerSaved)="onPartnerSaved()"
+/>
+
+<app-campaign-modal
+  [isOpen]="isCampaignModalOpen()"
+  [campaign]="selectedCampaign()"
+  [partners]="campanasService.partners()"
+  (close)="closeCampaignModal()"
+  (campaignSaved)="onCampaignSaved()"
+/>
+
+<app-audit-detail-modal
+  [isOpen]="isAuditDetailModalOpen()"
+  [log]="selectedAuditLog()"
+  (close)="closeAuditDetail()"
+/>

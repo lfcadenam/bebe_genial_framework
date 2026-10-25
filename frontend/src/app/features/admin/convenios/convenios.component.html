@@ -1,0 +1,387 @@
+<div class="space-y-6">
+
+  <!-- ==================== ENCABEZADO Y ACCIONES PRINCIPALES ==================== -->
+  <div class="bg-white rounded-[32px] p-6 sm:p-7 shadow-xs border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">
+          Módulo Comercial & Alianzas
+        </span>
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        <span class="text-xs font-semibold text-slate-400">
+          {{ commercialService.partnersMeta().total }} aliados registrados
+        </span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        Convenios & Distribuidores
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl leading-relaxed">
+        Gestiona alianzas institucionales, canales de venta independientes, asignación de cursos y cuotas autorizadas.
+      </p>
+    </div>
+
+    <!-- Botón Nuevo y Refrescar -->
+    <div class="flex items-center gap-3 self-start md:self-auto shrink-0">
+      <button
+        type="button"
+        (click)="openNewPartner()"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/25 active:scale-95 transition-all cursor-pointer"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Nuevo Aliado</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="loadPartners()"
+        class="inline-flex items-center gap-2 p-2.5 rounded-full text-slate-500 hover:text-slate-800 bg-slate-50 hover:bg-slate-100 border border-slate-200 active:scale-95 transition-all cursor-pointer"
+        title="Refrescar listado"
+      >
+        <svg class="w-4 h-4" [class.animate-spin]="commercialService.isLoading()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Flash Toast de Éxito -->
+  <div *ngIf="flashMessage()" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-between animate-in fade-in duration-200">
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      <span>{{ flashMessage() }}</span>
+    </div>
+    <button (click)="flashMessage.set(null)" class="text-emerald-700 hover:text-emerald-900 text-xs font-bold">×</button>
+  </div>
+
+  <!-- ==================== FILA DE KPIS COMERCIALES ==================== -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+    
+    <div class="bg-white rounded-[28px] p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-semibold text-slate-500">Total Entidades</p>
+        <p class="text-2xl font-extrabold text-slate-900 mt-1">
+          {{ commercialService.partnersKpis().total_partners }}
+        </p>
+        <p class="text-[11px] text-slate-400 mt-0.5">Canales registrados</p>
+      </div>
+      <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[28px] p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-semibold text-slate-500">Convenios Institucionales</p>
+        <p class="text-2xl font-extrabold text-slate-900 mt-1">
+          {{ commercialService.partnersKpis().total_agreements }}
+        </p>
+        <p class="text-[11px] text-emerald-600 font-semibold mt-0.5">Alianzas B2B</p>
+      </div>
+      <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[28px] p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-semibold text-slate-500">Distribuidores</p>
+        <p class="text-2xl font-extrabold text-slate-900 mt-1">
+          {{ commercialService.partnersKpis().total_distributors }}
+        </p>
+        <p class="text-[11px] text-slate-400 mt-0.5">Fuerza externa</p>
+      </div>
+      <div class="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[28px] p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-semibold text-slate-500">Aliados Activos</p>
+        <p class="text-2xl font-extrabold text-slate-900 mt-1">
+          {{ commercialService.partnersKpis().active_partners }}
+        </p>
+        <p class="text-[11px] text-emerald-600 font-semibold mt-0.5">En operación</p>
+      </div>
+      <div class="w-11 h-11 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== BARRA DE BÚSQUEDA Y FILTROS TIPO PÍLDORA ==================== -->
+  <div class="bg-white rounded-[28px] p-4 sm:p-5 shadow-xs border border-slate-200/80 space-y-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      
+      <!-- Buscador en Vivo -->
+      <div class="relative flex-1 max-w-lg">
+        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Buscar por razón social, contacto o correo..."
+          class="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-full bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+        />
+      </div>
+
+      <!-- Filtros por Tipo -->
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">Tipo:</span>
+        <button
+          type="button"
+          (click)="setTypeFilter('')"
+          class="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
+          [ngClass]="typeFilter() === '' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        >
+          Todos
+        </button>
+        <button
+          type="button"
+          (click)="setTypeFilter('agreement')"
+          class="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
+          [ngClass]="typeFilter() === 'agreement' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        >
+          Convenios
+        </button>
+        <button
+          type="button"
+          (click)="setTypeFilter('distributor')"
+          class="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
+          [ngClass]="typeFilter() === 'distributor' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        >
+          Distribuidores
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Filtros por Estado -->
+    <div class="flex items-center gap-1.5 flex-wrap pt-3 border-t border-slate-100 text-xs">
+      <span class="font-bold text-slate-400 uppercase tracking-wider mr-1">Estado:</span>
+      <button
+        type="button"
+        (click)="setStatusFilter('')"
+        class="px-3 py-1 rounded-full font-bold transition-all cursor-pointer"
+        [ngClass]="statusFilter() === '' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+      >
+        Todos
+      </button>
+      <button
+        type="button"
+        (click)="setStatusFilter('active')"
+        class="px-3 py-1 rounded-full font-bold transition-all cursor-pointer"
+        [ngClass]="statusFilter() === 'active' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+      >
+        Activos
+      </button>
+      <button
+        type="button"
+        (click)="setStatusFilter('inactive')"
+        class="px-3 py-1 rounded-full font-bold transition-all cursor-pointer"
+        [ngClass]="statusFilter() === 'inactive' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+      >
+        Inactivos
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== TABLA ELEVADA SUAVE (Nuvex Modern Curve UI) ==================== -->
+  <div class="bg-white rounded-[32px] p-6 shadow-xs border border-slate-200/80 overflow-hidden">
+    
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <th class="pb-3 px-3">Aliado / Razón Social</th>
+            <th class="pb-3 px-3">Persona de Contacto</th>
+            <th class="pb-3 px-3">Cursos & Vigencia</th>
+            <th class="pb-3 px-3">Alumnos</th>
+            <th class="pb-3 px-3">Estado</th>
+            <th class="pb-3 px-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-xs">
+          
+          <tr *ngIf="commercialService.isLoading()">
+            <td colspan="6" class="py-8 text-center text-slate-400">
+              <div class="inline-flex items-center gap-2">
+                <svg class="w-4 h-4 animate-spin text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Cargando aliados comerciales...</span>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="!commercialService.isLoading() && !commercialService.partners().length">
+            <td colspan="6" class="py-8 text-center text-slate-400">
+              No se encontraron aliados comerciales que coincidan con la búsqueda.
+            </td>
+          </tr>
+
+          <tr
+            *ngFor="let p of commercialService.partners()"
+            class="hover:bg-slate-50/80 transition-colors group"
+          >
+            <!-- Razón Social y Tipo -->
+            <td class="py-3.5 px-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 font-extrabold flex items-center justify-center shrink-0 text-xs shadow-xs">
+                  {{ p.company_name.charAt(0) }}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="block font-bold text-slate-900 truncate">{{ p.company_name }}</span>
+                    <span
+                      class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shrink-0"
+                      [ngClass]="p.is_agreement ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : 'bg-slate-100 text-slate-700'"
+                    >
+                      {{ p.is_agreement ? 'Convenio' : 'Distribuidor' }}
+                    </span>
+                  </div>
+                  <span *ngIf="p.notes" class="block text-[11px] text-slate-400 truncate max-w-xs">{{ p.notes }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Contacto -->
+            <td class="py-3.5 px-3">
+              <span class="block font-semibold text-slate-800 truncate">{{ p.contact_name }}</span>
+              <span class="block text-[11px] text-slate-400 truncate">{{ p.contact_email }}</span>
+              <span *ngIf="p.contact_phone" class="block text-[11px] text-slate-400 font-mono">{{ p.contact_phone }}</span>
+            </td>
+
+            <!-- Cursos y Vigencia -->
+            <td class="py-3.5 px-3">
+              <span class="block font-semibold text-slate-800">
+                {{ p.allowed_courses?.length || 0 }} cursos autorizados
+              </span>
+              <span class="block text-[11px] text-emerald-600 font-semibold">
+                {{ p.allowed_months }} meses de acceso
+              </span>
+            </td>
+
+            <!-- Alumnos Vinculados -->
+            <td class="py-3.5 px-3">
+              <button
+                type="button"
+                (click)="openStudentsModal(p)"
+                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 hover:bg-emerald-50 hover:text-emerald-700 transition-colors cursor-pointer"
+                title="Ver alumnos registrados"
+              >
+                <span>{{ p.students_count || 0 }} alumnos</span>
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </td>
+
+            <!-- Estado -->
+            <td class="py-3.5 px-3">
+              <span
+                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                [ngClass]="p.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-amber-50 text-amber-700 border border-amber-100'"
+              >
+                {{ p.status }}
+              </span>
+            </td>
+
+            <!-- Acciones -->
+            <td class="py-3.5 px-3 text-right">
+              <div class="flex items-center justify-end gap-1">
+                
+                <button
+                  type="button"
+                  (click)="openEditPartner(p)"
+                  title="Editar parámetros del aliado"
+                  class="p-2 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+
+                <button
+                  type="button"
+                  (click)="onDeletePartner(p)"
+                  title="Eliminar aliado"
+                  class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginador Inferior -->
+    <div class="pt-5 border-t border-slate-100 mt-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div>
+        Mostrando página <strong>{{ commercialService.partnersMeta().current_page }}</strong> de <strong>{{ commercialService.partnersMeta().last_page }}</strong>
+        (Total: {{ commercialService.partnersMeta().total }} aliados)
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          (click)="onPageChange(currentPage() - 1)"
+          [disabled]="currentPage() <= 1"
+          class="px-3.5 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-semibold"
+        >
+          Anterior
+        </button>
+
+        <span class="px-2 font-bold text-slate-700">
+          {{ currentPage() }}
+        </span>
+
+        <button
+          type="button"
+          (click)="onPageChange(currentPage() + 1)"
+          [disabled]="currentPage() >= commercialService.partnersMeta().last_page"
+          class="px-3.5 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-semibold"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Subcomponentes Modales y Drawer -->
+  <app-partner-drawer
+    [isOpen]="isDrawerOpen()"
+    [partner]="selectedPartner()"
+    (close)="closeDrawer()"
+    (partnerSaved)="onPartnerSaved()"
+  ></app-partner-drawer>
+
+  <app-partner-students-modal
+    [isOpen]="isStudentsModalOpen()"
+    [partner]="selectedPartner()"
+    (close)="closeStudentsModal()"
+  ></app-partner-students-modal>
+
+</div>

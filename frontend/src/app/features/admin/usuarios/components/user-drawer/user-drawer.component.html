@@ -1,0 +1,296 @@
+<!-- Backdrop Oscurecido Sutilmente -->
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 bg-slate-900/25 backdrop-blur-xs z-50 transition-opacity"
+  (click)="onClose()"
+></div>
+
+<!-- Drawer Lateral Deslizable (Pure Light Theme) -->
+<div
+  *ngIf="isOpen"
+  class="fixed inset-y-0 right-0 w-full max-w-xl bg-white shadow-2xl z-50 flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-300"
+>
+  <!-- Cabecera del Drawer -->
+  <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-800 font-extrabold flex items-center justify-center text-sm shadow-xs">
+        {{ form.first_name ? form.first_name.charAt(0) : 'U' }}
+      </div>
+      <div>
+        <h3 class="text-base font-extrabold text-slate-900 leading-tight">
+          {{ form.first_name }} {{ form.last_name }}
+        </h3>
+        <p class="text-xs text-slate-400">ID Usuario #{{ user?.id }} · Ficha Técnica</p>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      (click)="onClose()"
+      class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+      title="Cerrar panel"
+    >
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Contenido Desplazable del Formulario -->
+  <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+    <!-- Mensajes de Estado -->
+    <div *ngIf="successMessage()" class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+      <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      <span>{{ successMessage() }}</span>
+    </div>
+
+    <div *ngIf="errorMessage()" class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+      <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
+
+    <form id="userDrawerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      
+      <!-- SECCIÓN 1: DATOS DEL ACUDIENTE / USUARIO -->
+      <div class="bg-slate-50/70 rounded-2xl p-4 sm:p-5 border border-slate-100">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-3 flex items-center gap-1.5">
+          <span>Datos del Acudiente / Tutor</span>
+        </h4>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Nombre</label>
+            <input
+              type="text"
+              name="first_name"
+              [(ngModel)]="form.first_name"
+              required
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Apellidos</label>
+            <input
+              type="text"
+              name="last_name"
+              [(ngModel)]="form.last_name"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Correo Electrónico</label>
+            <input
+              type="email"
+              name="email"
+              [(ngModel)]="form.email"
+              required
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Teléfono Móvil</label>
+            <input
+              type="text"
+              name="phone"
+              [(ngModel)]="form.phone"
+              placeholder="Ej: 3001234567"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Rol en Sistema</label>
+            <select
+              name="role"
+              [(ngModel)]="form.role"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            >
+              <option value="parent">Alumno / Acudiente (Padre)</option>
+              <option value="admin">Administrador Maestro</option>
+              <option value="supervisor">Supervisor Comercial</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Estado de la Cuenta</label>
+            <select
+              name="status"
+              [(ngModel)]="form.status"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            >
+              <option value="active">Activo (Acceso habilitado)</option>
+              <option value="inactive">Inactivo</option>
+              <option value="suspended">Suspendido (Mora o Bloqueo)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-3 pt-3 border-t border-slate-200/60 flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="mustChangePass"
+            name="must_change_password"
+            [(ngModel)]="form.must_change_password"
+            class="rounded text-emerald-600 focus:ring-emerald-500"
+          />
+          <label for="mustChangePass" class="text-xs text-slate-600 select-none">
+            Obligar a cambiar la contraseña en su próximo inicio de sesión
+          </label>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: PERFIL DEL BEBÉ / MENOR -->
+      <div class="bg-slate-50/70 rounded-2xl p-4 sm:p-5 border border-slate-100">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-3 flex items-center gap-1.5">
+          <span>Ficha del Menor / Estudiante</span>
+        </h4>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Nombre Completo del Bebé</label>
+            <input
+              type="text"
+              name="baby_full_name"
+              [(ngModel)]="form.baby_full_name"
+              placeholder="Ej: Bebe Junior"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Fecha de Nacimiento</label>
+            <input
+              type="date"
+              name="baby_birth_date"
+              [(ngModel)]="form.baby_birth_date"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Grado Escolar</label>
+            <input
+              type="text"
+              name="baby_school_grade"
+              [(ngModel)]="form.baby_school_grade"
+              placeholder="Ej: Caminadores / Pre-jardín"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Institución / Jardín</label>
+            <input
+              type="text"
+              name="baby_school_name"
+              [(ngModel)]="form.baby_school_name"
+              placeholder="Ej: Jardín Infantil Bebé Genial"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 3: MATRÍCULAS ASIGNADAS -->
+      <div class="bg-slate-50/70 rounded-2xl p-4 sm:p-5 border border-slate-100">
+        <div class="flex items-center justify-between mb-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700">
+            Matrículas y Cursos Asignados ({{ user?.enrollments?.length || 0 }})
+          </h4>
+        </div>
+
+        <div *ngIf="!user?.enrollments?.length" class="text-center py-4 text-xs text-slate-400">
+          Este usuario no tiene matrículas registradas aún.
+        </div>
+
+        <div *ngIf="user?.enrollments?.length" class="space-y-2.5">
+          <div
+            *ngFor="let item of user?.enrollments"
+            class="p-3 bg-white rounded-xl border border-slate-200/80 flex items-center justify-between gap-3 text-xs"
+          >
+            <div class="min-w-0">
+              <span class="block font-bold text-slate-800 truncate">{{ item.course_title }}</span>
+              <div class="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                <span>Vence: <strong>{{ item.expires_at }}</strong></span>
+                <span>·</span>
+                <span class="capitalize">Acceso: {{ item.access_type }}</span>
+                <span *ngIf="item.book_limit">({{ item.book_limit }} libros)</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <span
+                class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                [ngClass]="item.is_valid ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'"
+              >
+                {{ item.is_valid ? 'Vigente' : 'Vencida' }}
+              </span>
+
+              <button
+                type="button"
+                (click)="onDeleteEnrollment(item.id, item.course_title)"
+                title="Cancelar matrícula"
+                class="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+              >
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 4: ACCIONES DE SEGURIDAD / SOPORTE -->
+      <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/60 flex items-center justify-between gap-4">
+        <div>
+          <span class="block text-xs font-bold text-amber-900">Restablecer Contraseña</span>
+          <span class="block text-[11px] text-amber-700 mt-0.5">
+            Asigna temporalmente la clave estándar <code>123</code> para asistencia telefónica.
+          </span>
+        </div>
+
+        <button
+          type="button"
+          (click)="onResetPassword()"
+          [disabled]="isResettingPassword()"
+          class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shrink-0 transition-colors active:scale-95 disabled:opacity-50 cursor-pointer"
+        >
+          {{ isResettingPassword() ? 'Restableciendo...' : 'Restablecer a 123' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Pie del Drawer con Botones de Acción -->
+  <div class="px-6 py-4 border-t border-slate-100 bg-white flex items-center justify-end gap-3">
+    <button
+      type="button"
+      (click)="onClose()"
+      class="px-4 py-2.5 rounded-full text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+    >
+      Cancelar
+    </button>
+
+    <button
+      type="submit"
+      form="userDrawerForm"
+      [disabled]="isSaving()"
+      class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+    >
+      <svg *ngIf="isSaving()" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+      <span>{{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}</span>
+    </button>
+  </div>
+</div>

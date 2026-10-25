@@ -1,0 +1,243 @@
+<!-- Backdrop Oscurecido Sutilmente -->
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 bg-slate-900/25 backdrop-blur-xs z-50 transition-opacity"
+  (click)="onClose()"
+></div>
+
+<!-- Drawer Lateral Deslizable (Pure Light Theme) -->
+<div
+  *ngIf="isOpen"
+  class="fixed inset-y-0 right-0 w-full max-w-xl bg-white shadow-2xl z-50 flex flex-col justify-between overflow-hidden animate-in slide-in-from-right duration-300"
+>
+  <!-- Cabecera del Drawer -->
+  <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-100 font-extrabold flex items-center justify-center text-sm shadow-xs">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-base font-extrabold text-slate-900 leading-tight">
+          {{ partner ? 'Editar Aliado Comercial' : 'Nuevo Distribuidor / Convenio' }}
+        </h3>
+        <p class="text-xs text-slate-400">
+          {{ partner ? ('ID #' + partner.id + ' · ' + partner.company_name) : 'Parametrización de cursos y vigencias de comercialización' }}
+        </p>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      (click)="onClose()"
+      class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+      title="Cerrar panel"
+    >
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Contenido Desplazable del Formulario -->
+  <div class="flex-1 overflow-y-auto p-6 space-y-6">
+
+    <!-- Mensaje de Error -->
+    <div *ngIf="errorMessage()" class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold flex items-center gap-2">
+      <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span>{{ errorMessage() }}</span>
+    </div>
+
+    <form id="partnerDrawerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      
+      <!-- SECCIÓN 1: DATOS DE LA EMPRESA O CONVENIO -->
+      <div class="bg-slate-50/70 rounded-2xl p-4 sm:p-5 border border-slate-100 space-y-3.5">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2">
+          Datos de la Entidad Comercial
+        </h4>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Nombre Comercial / Razón Social <span class="text-rose-500">*</span></label>
+          <input
+            type="text"
+            name="company_name"
+            [(ngModel)]="form.company_name"
+            required
+            placeholder="Ej: Colsubsidio Educación / Distribuidor Norte"
+            class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+          />
+        </div>
+
+        <!-- Tipo de Entidad -->
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1.5">Tipo de Relación Comercial</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label
+              class="p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between"
+              [ngClass]="form.is_agreement ? 'bg-emerald-50/60 border-emerald-500 ring-1 ring-emerald-500/20' : 'bg-white border-slate-200 hover:bg-slate-50'"
+            >
+              <div>
+                <span class="block text-xs font-bold text-slate-800">Convenio</span>
+                <span class="block text-[10px] text-slate-400">Institucional / Aliado</span>
+              </div>
+              <input type="radio" name="is_agreement" [value]="true" [(ngModel)]="form.is_agreement" class="text-emerald-600" />
+            </label>
+
+            <label
+              class="p-3 rounded-xl border cursor-pointer transition-all flex items-center justify-between"
+              [ngClass]="!form.is_agreement ? 'bg-emerald-50/60 border-emerald-500 ring-1 ring-emerald-500/20' : 'bg-white border-slate-200 hover:bg-slate-50'"
+            >
+              <div>
+                <span class="block text-xs font-bold text-slate-800">Distribuidor</span>
+                <span class="block text-[10px] text-slate-400">Comercial Independiente</span>
+              </div>
+              <input type="radio" name="is_agreement" [value]="false" [(ngModel)]="form.is_agreement" class="text-emerald-600" />
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Persona de Contacto <span class="text-rose-500">*</span></label>
+            <input
+              type="text"
+              name="contact_name"
+              [(ngModel)]="form.contact_name"
+              required
+              placeholder="Ej: Ana Gómez"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Correo Electrónico <span class="text-rose-500">*</span></label>
+            <input
+              type="email"
+              name="contact_email"
+              [(ngModel)]="form.contact_email"
+              required
+              placeholder="correo@aliado.com"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Teléfono Móvil</label>
+            <input
+              type="text"
+              name="contact_phone"
+              [(ngModel)]="form.contact_phone"
+              placeholder="Ej: 3001234567"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Estado</label>
+            <select
+              name="status"
+              [(ngModel)]="form.status"
+              class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+            >
+              <option value="active">Activo (Habilitado)</option>
+              <option value="inactive">Inactivo</option>
+              <option value="suspended">Suspendido</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: CURSOS PERMITIDOS PARA VENTA O ASIGNACIÓN -->
+      <div class="bg-slate-50/70 rounded-2xl p-4 sm:p-5 border border-slate-100">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-2">
+          Cursos Permitidos para Comercialización
+        </h4>
+        <p class="text-[11px] text-slate-400 mb-3">
+          Selecciona los cursos del aula que este distribuidor o convenio podrá otorgar a sus estudiantes.
+        </p>
+
+        <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+          <div
+            *ngFor="let course of courses()"
+            (click)="toggleCourse(course.id)"
+            class="p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition-all"
+            [ngClass]="isCourseSelected(course.id) ? 'bg-emerald-50 border-emerald-300' : 'bg-white border-slate-200 hover:bg-slate-50'"
+          >
+            <div class="flex items-center gap-2.5">
+              <input
+                type="checkbox"
+                [checked]="isCourseSelected(course.id)"
+                (click)="$event.stopPropagation(); toggleCourse(course.id)"
+                class="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              />
+              <span class="text-xs font-semibold text-slate-800">{{ course.title }}</span>
+            </div>
+            <span class="text-[10px] text-slate-400">{{ course.hours || 0 }} hrs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 3: TIEMPO PERMITIDO (VIGENCIA EN MESES) -->
+      <div class="bg-slate-50/70 rounded-2xl p-4 sm:p-5 border border-slate-100">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-700 mb-1">
+          Vigencia de Matrícula Otorgada (Meses)
+        </h4>
+        <p class="text-[11px] text-slate-400 mb-3">
+          Duración del acceso que el convenio o distribuidor otorga a cada alumno registrado.
+        </p>
+
+        <div class="flex items-center gap-3">
+          <input
+            type="number"
+            name="allowed_months"
+            [(ngModel)]="form.allowed_months"
+            min="1"
+            max="120"
+            required
+            class="w-28 px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+          />
+          <span class="text-xs text-slate-600 font-medium">Meses de vigencia (ej: 1, 3, 6, 12, 24)</span>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 4: NOTAS COMERCIALES -->
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Notas Comerciales / Condiciones de Acuerdo</label>
+        <textarea
+          name="notes"
+          [(ngModel)]="form.notes"
+          rows="3"
+          placeholder="Condiciones contractuales, comisiones acordadas o contactos alternativos..."
+          class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+        ></textarea>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Pie del Drawer con Botones de Acción -->
+  <div class="px-6 py-4 border-t border-slate-100 bg-white flex items-center justify-end gap-3">
+    <button
+      type="button"
+      (click)="onClose()"
+      class="px-4 py-2.5 rounded-full text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+    >
+      Cancelar
+    </button>
+
+    <button
+      type="submit"
+      form="partnerDrawerForm"
+      [disabled]="isSaving()"
+      class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+    >
+      <svg *ngIf="isSaving()" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+      <span>{{ isSaving() ? 'Guardando...' : (partner ? 'Actualizar Aliado' : 'Crear Aliado') }}</span>
+    </button>
+  </div>
+</div>

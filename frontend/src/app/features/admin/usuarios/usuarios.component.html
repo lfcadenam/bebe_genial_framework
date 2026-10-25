@@ -1,0 +1,355 @@
+<div class="space-y-6">
+
+  <!-- ==================== ENCABEZADO Y ACCIONES PRINCIPALES ==================== -->
+  <div class="bg-white rounded-[32px] p-6 sm:p-7 shadow-xs border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">
+          Módulo Académico & Soporte
+        </span>
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        <span class="text-xs font-semibold text-slate-400">
+          {{ usersService.meta().total }} usuarios registrados
+        </span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        Gestión de Usuarios & Alumnos
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl leading-relaxed">
+        Supervisa cuentas de padres, menores asociados, estado de matrículas y restablecimiento de credenciales.
+      </p>
+    </div>
+
+    <!-- Acciones Superiores -->
+    <div class="flex items-center gap-3 self-start md:self-auto shrink-0">
+      <button
+        type="button"
+        (click)="exportToCsv()"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 active:scale-95 transition-all cursor-pointer"
+        title="Exportar listado actual a Excel / CSV"
+      >
+        <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span>Exportar CSV</span>
+      </button>
+
+      <button
+        type="button"
+        (click)="loadUsers()"
+        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 active:scale-95 transition-all cursor-pointer"
+        title="Refrescar datos"
+      >
+        <svg class="w-4 h-4 text-slate-500" [class.animate-spin]="usersService.isLoading()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>Actualizar</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Flash Toast de Éxito -->
+  <div *ngIf="flashMessage()" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-between animate-in fade-in duration-200">
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      <span>{{ flashMessage() }}</span>
+    </div>
+    <button (click)="flashMessage.set(null)" class="text-emerald-700 hover:text-emerald-900 text-xs font-bold">×</button>
+  </div>
+
+  <!-- ==================== BARRA DE BÚSQUEDA Y FILTROS TIPO PÍLDORA ==================== -->
+  <div class="bg-white rounded-[28px] p-4 sm:p-5 shadow-xs border border-slate-200/80 space-y-4">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      
+      <!-- Buscador en Vivo -->
+      <div class="relative flex-1 max-w-lg">
+        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Buscar por acudiente, menor, correo o teléfono..."
+          class="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-full bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+        />
+      </div>
+
+      <!-- Filtros por Rol -->
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">Rol:</span>
+        <button
+          type="button"
+          (click)="setRoleFilter('')"
+          class="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
+          [ngClass]="roleFilter() === '' ? 'bg-slate-900 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        >
+          Todos
+        </button>
+        <button
+          type="button"
+          (click)="setRoleFilter('parent')"
+          class="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
+          [ngClass]="roleFilter() === 'parent' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        >
+          Alumnos / Padres
+        </button>
+        <button
+          type="button"
+          (click)="setRoleFilter('admin')"
+          class="px-3 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer"
+          [ngClass]="roleFilter() === 'admin' ? 'bg-emerald-500 text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        >
+          Administradores
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Filtros por Estado -->
+    <div class="flex items-center gap-1.5 flex-wrap pt-3 border-t border-slate-100 text-xs">
+      <span class="font-bold text-slate-400 uppercase tracking-wider mr-1">Estado:</span>
+      <button
+        type="button"
+        (click)="setStatusFilter('')"
+        class="px-3 py-1 rounded-full font-bold transition-all cursor-pointer"
+        [ngClass]="statusFilter() === '' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+      >
+        Todos
+      </button>
+      <button
+        type="button"
+        (click)="setStatusFilter('active')"
+        class="px-3 py-1 rounded-full font-bold transition-all cursor-pointer"
+        [ngClass]="statusFilter() === 'active' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+      >
+        Activos
+      </button>
+      <button
+        type="button"
+        (click)="setStatusFilter('inactive')"
+        class="px-3 py-1 rounded-full font-bold transition-all cursor-pointer"
+        [ngClass]="statusFilter() === 'inactive' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+      >
+        Inactivos
+      </button>
+      <button
+        type="button"
+        (click)="setStatusFilter('suspended')"
+        class="px-3 py-1 rounded-full font-bold transition-all cursor-pointer"
+        [ngClass]="statusFilter() === 'suspended' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+      >
+        Suspendidos
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== TABLA ELEVADA SUAVE (Nuvex Modern Curve UI - Tema Claro) ==================== -->
+  <div class="bg-white rounded-[32px] p-6 shadow-xs border border-slate-200/80 overflow-hidden">
+    
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <th class="pb-3 px-3">Acudiente / Usuario</th>
+            <th class="pb-3 px-3">Menor Asociado</th>
+            <th class="pb-3 px-3">Contacto</th>
+            <th class="pb-3 px-3">Matrículas</th>
+            <th class="pb-3 px-3">Rol & Estado</th>
+            <th class="pb-3 px-3 text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-xs">
+          
+          <!-- Skeleton / Loading State -->
+          <tr *ngIf="usersService.isLoading()">
+            <td colspan="6" class="py-8 text-center text-slate-400">
+              <div class="inline-flex items-center gap-2">
+                <svg class="w-4 h-4 animate-spin text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Cargando usuarios...</span>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Empty State -->
+          <tr *ngIf="!usersService.isLoading() && !usersService.users().length">
+            <td colspan="6" class="py-8 text-center text-slate-400">
+              No se encontraron usuarios que coincidan con los criterios de búsqueda.
+            </td>
+          </tr>
+
+          <!-- Lista de Registros -->
+          <tr
+            *ngFor="let user of usersService.users()"
+            class="hover:bg-slate-50/80 transition-colors group"
+          >
+            <!-- Columna Usuario -->
+            <td class="py-3.5 px-3">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-800 font-extrabold flex items-center justify-center shrink-0 border border-emerald-200/60 shadow-xs">
+                  {{ user.first_name ? user.first_name.charAt(0) : 'U' }}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="block font-bold text-slate-900 truncate">{{ user.full_name }}</span>
+                    <span class="text-[10px] font-mono text-slate-400">#{{ user.id }}</span>
+                  </div>
+                  <span class="block text-[11px] text-slate-400 truncate">{{ user.email }}</span>
+                </div>
+              </div>
+            </td>
+
+            <!-- Columna Menor -->
+            <td class="py-3.5 px-3">
+              <div *ngIf="user.baby_profile">
+                <span class="block font-semibold text-slate-800 truncate">{{ user.baby_profile.full_name }}</span>
+                <span class="block text-[11px] text-slate-400 truncate">
+                  {{ user.baby_profile.school_grade || 'Sin grado' }} · {{ user.baby_profile.birth_date || 'Sin fecha' }}
+                </span>
+              </div>
+              <div *ngIf="!user.baby_profile" class="text-slate-400 text-[11px] italic">
+                Sin menor vinculado
+              </div>
+            </td>
+
+            <!-- Columna Contacto -->
+            <td class="py-3.5 px-3 text-slate-600 font-mono text-[11px]">
+              {{ user.phone || 'No registrado' }}
+            </td>
+
+            <!-- Columna Matrículas -->
+            <td class="py-3.5 px-3">
+              <div class="flex items-center gap-1.5">
+                <span
+                  class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold"
+                  [ngClass]="user.active_enrollments > 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-slate-100 text-slate-500'"
+                >
+                  {{ user.active_enrollments }} activas
+                </span>
+                <span class="text-[11px] text-slate-400">/ {{ user.total_enrollments }} total</span>
+              </div>
+            </td>
+
+            <!-- Columna Rol & Estado -->
+            <td class="py-3.5 px-3">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span
+                  class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                  [ngClass]="user.role === 'admin' ? 'bg-indigo-50 text-indigo-700 border border-indigo-100' : 'bg-slate-100 text-slate-700'"
+                >
+                  {{ user.role }}
+                </span>
+
+                <span
+                  class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                  [ngClass]="user.status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-rose-50 text-rose-700 border border-rose-100'"
+                >
+                  {{ user.status }}
+                </span>
+              </div>
+            </td>
+
+            <!-- Columna Acciones -->
+            <td class="py-3.5 px-3 text-right">
+              <div class="flex items-center justify-end gap-1">
+                
+                <!-- Botón Ficha / Editar -->
+                <button
+                  type="button"
+                  (click)="openDrawer(user)"
+                  title="Ver y editar ficha completa"
+                  class="p-2 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+
+                <!-- Botón Matricular Curso -->
+                <button
+                  type="button"
+                  (click)="openMatriculaModal(user)"
+                  title="Asignar o renovar matrícula"
+                  class="p-2 rounded-xl text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+
+                <!-- Botón Restablecer Clave Rápido -->
+                <button
+                  type="button"
+                  (click)="onQuickResetPassword(user)"
+                  title="Restablecer contraseña a 123"
+                  class="p-2 rounded-xl text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer"
+                >
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                </button>
+
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Paginador Inferior -->
+    <div class="pt-5 border-t border-slate-100 mt-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div>
+        Mostrando página <strong>{{ usersService.meta().current_page }}</strong> de <strong>{{ usersService.meta().last_page }}</strong>
+        (Total: {{ usersService.meta().total }} registros)
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          (click)="onPageChange(currentPage() - 1)"
+          [disabled]="currentPage() <= 1"
+          class="px-3.5 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-semibold"
+        >
+          Anterior
+        </button>
+
+        <span class="px-2 font-bold text-slate-700">
+          {{ currentPage() }}
+        </span>
+
+        <button
+          type="button"
+          (click)="onPageChange(currentPage() + 1)"
+          [disabled]="currentPage() >= usersService.meta().last_page"
+          class="px-3.5 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer font-semibold"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== SUBCOMPONENTES MODALES Y DRAWER ==================== -->
+  <app-user-drawer
+    [isOpen]="isDrawerOpen()"
+    [user]="activeUser()"
+    (close)="closeDrawer()"
+    (userUpdated)="onUserUpdated()"
+  ></app-user-drawer>
+
+  <app-matricula-modal
+    [isOpen]="isModalOpen()"
+    [user]="activeUser()"
+    [courses]="usersService.courses()"
+    (close)="closeMatriculaModal()"
+    (enrollmentCreated)="onEnrollmentCreated()"
+  ></app-matricula-modal>
+
+</div>

@@ -1,0 +1,410 @@
+<div class="space-y-6">
+
+  <!-- ==================== ENCABEZADO Y KPIS FINANCIEROS ==================== -->
+  <div class="bg-white rounded-[32px] p-6 sm:p-7 shadow-xs border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <div class="flex items-center gap-2 mb-1">
+        <span class="text-xs font-bold text-violet-600 uppercase tracking-wider">
+          Pasarela Bancaria & Cobros Recurrentes
+        </span>
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-violet-500"></span>
+        <span class="text-xs font-semibold text-slate-400">
+          WOMPI Bancolombia
+        </span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+        Planes & Monitor WOMPI
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl leading-relaxed">
+        Catálogo de suscripciones periódicas, monitoreo de transacciones en tiempo real y conciliación bancaria.
+      </p>
+    </div>
+
+    <!-- Pestañas de Navegación Tipo Píldora -->
+    <div class="flex items-center gap-2 p-1.5 bg-slate-100/80 rounded-full self-start md:self-auto shrink-0">
+      <button
+        type="button"
+        (click)="setTab('planes')"
+        class="px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer"
+        [ngClass]="activeTab() === 'planes' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+      >
+        Planes de Pago
+      </button>
+
+      <button
+        type="button"
+        (click)="setTab('transacciones')"
+        class="px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer"
+        [ngClass]="activeTab() === 'transacciones' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+      >
+        Monitor de Transacciones
+      </button>
+    </div>
+  </div>
+
+  <!-- Flash Toast de Éxito -->
+  <div *ngIf="flashMessage()" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-between animate-in fade-in duration-200">
+    <div class="flex items-center gap-2">
+      <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+      <span>{{ flashMessage() }}</span>
+    </div>
+    <button (click)="flashMessage.set(null)" class="text-emerald-700 hover:text-emerald-900 text-xs font-bold">×</button>
+  </div>
+
+  <!-- ==================== FILA DE KPIS FINANCIEROS (WOMPI) ==================== -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+    
+    <div class="bg-white rounded-[28px] p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-semibold text-slate-500">Recaudo Total Aprobado</p>
+        <p class="text-2xl font-extrabold text-slate-900 mt-1">
+          {{ commercialService.wompiMetrics()?.formatted_revenue || '$ 0' }}
+        </p>
+        <p class="text-[11px] text-emerald-600 font-semibold mt-0.5">Ingresos reales</p>
+      </div>
+      <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[28px] p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-semibold text-slate-500">Transacciones Exitosas</p>
+        <p class="text-2xl font-extrabold text-slate-900 mt-1">
+          {{ commercialService.wompiMetrics()?.approved_count ?? 0 }}
+        </p>
+        <p class="text-[11px] text-slate-400 mt-0.5">Pagos verificados</p>
+      </div>
+      <div class="w-11 h-11 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[28px] p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-semibold text-slate-500">Tasa de Aprobación</p>
+        <p class="text-2xl font-extrabold text-slate-900 mt-1">
+          {{ commercialService.wompiMetrics()?.success_rate ?? '0%' }}
+        </p>
+        <p class="text-[11px] text-slate-400 mt-0.5">Conversión de pasarela</p>
+      </div>
+      <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[28px] p-5 shadow-xs border border-slate-200/80 flex items-center justify-between">
+      <div>
+        <p class="text-xs font-semibold text-slate-500">Planes Activos</p>
+        <p class="text-2xl font-extrabold text-slate-900 mt-1">
+          {{ commercialService.wompiMetrics()?.active_plans ?? 0 }}
+        </p>
+        <p class="text-[11px] text-emerald-600 font-semibold mt-0.5">Disponibles en web</p>
+      </div>
+      <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==================== PESTAÑA 1: CATÁLOGO DE PLANES DE PAGO ==================== -->
+  <div *ngIf="activeTab() === 'planes'" class="space-y-6">
+    
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-base font-extrabold text-slate-900">Planes de Suscripción</h2>
+        <p class="text-xs text-slate-400">Tarifas y paquetes periódicos configurados para WOMPI</p>
+      </div>
+
+      <button
+        type="button"
+        (click)="openNewPlan()"
+        class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold text-white bg-emerald-500 hover:bg-emerald-600 shadow-md shadow-emerald-500/25 active:scale-95 transition-all cursor-pointer"
+      >
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>Nuevo Plan</span>
+      </button>
+    </div>
+
+    <!-- Grid de Tarjetas de Planes (Nuvex Modern Curve UI) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
+      <div
+        *ngFor="let plan of commercialService.wompiPlans()"
+        class="bg-white rounded-[32px] p-6 shadow-xs border border-slate-200/80 flex flex-col justify-between transition-all hover:shadow-md relative overflow-hidden"
+      >
+        <div class="space-y-4">
+          
+          <div class="flex items-center justify-between">
+            <span
+              class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+              [ngClass]="plan.is_active ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : 'bg-slate-100 text-slate-500'"
+            >
+              {{ plan.is_active ? 'Activo' : 'Inactivo' }}
+            </span>
+
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+              {{ plan.type === 'recurring' ? 'Recurrente' : 'Pago Único' }}
+            </span>
+          </div>
+
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900 leading-tight">{{ plan.name }}</h3>
+            <p *ngIf="plan.benefits" class="text-xs text-slate-500 mt-1 line-clamp-2">
+              {{ plan.benefits }}
+            </p>
+          </div>
+
+          <div class="pt-2">
+            <span class="text-3xl font-extrabold text-slate-900">
+              ${{ (+plan.price).toLocaleString('es-CO') }}
+            </span>
+            <span class="text-xs text-slate-400 ml-1">/ {{ plan.duration_months }} {{ plan.duration_months === 1 ? 'mes' : 'meses' }}</span>
+          </div>
+
+          <div class="p-3 bg-slate-50/70 rounded-2xl border border-slate-100 space-y-1.5 text-xs text-slate-600">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Días de prueba:</span>
+              <span class="font-semibold">{{ plan.trial_days > 0 ? (plan.trial_days + ' días') : 'Sin prueba' }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Cursos asociados:</span>
+              <span class="font-semibold">{{ plan.related_courses?.length || 0 }} cursos</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Suscripciones activas:</span>
+              <span class="font-bold text-emerald-600">{{ plan.active_subscriptions_count || 0 }}</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="pt-5 border-t border-slate-100 mt-5 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            (click)="onTogglePlan(plan)"
+            class="text-xs font-bold transition-colors cursor-pointer"
+            [ngClass]="plan.is_active ? 'text-amber-600 hover:text-amber-700' : 'text-emerald-600 hover:text-emerald-700'"
+          >
+            {{ plan.is_active ? 'Desactivar' : 'Activar' }}
+          </button>
+
+          <button
+            type="button"
+            (click)="openEditPlan(plan)"
+            class="px-4 py-1.5 rounded-full text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
+          >
+            Editar Plan
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==================== PESTAÑA 2: MONITOR DE TRANSACCIONES EN VIVO ==================== -->
+  <div *ngIf="activeTab() === 'transacciones'" class="space-y-6">
+    
+    <!-- Filtros de Transacciones -->
+    <div class="bg-white rounded-[28px] p-4 sm:p-5 shadow-xs border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      
+      <div class="relative flex-1 max-w-lg">
+        <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input
+          type="text"
+          [ngModel]="transactionSearch()"
+          (ngModelChange)="onSearchChange($event)"
+          placeholder="Buscar por referencia, cliente, correo o método..."
+          class="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-full bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all font-medium"
+        />
+      </div>
+
+      <div class="flex items-center gap-1.5 flex-wrap text-xs">
+        <span class="font-bold text-slate-400 uppercase tracking-wider mr-1">Estado:</span>
+        <button
+          type="button"
+          (click)="setStatusFilter('')"
+          class="px-3 py-1.5 rounded-full font-bold transition-all cursor-pointer"
+          [ngClass]="statusFilter() === '' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        >
+          Todas
+        </button>
+        <button
+          type="button"
+          (click)="setStatusFilter('APPROVED')"
+          class="px-3 py-1.5 rounded-full font-bold transition-all cursor-pointer"
+          [ngClass]="statusFilter() === 'APPROVED' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        >
+          Aprobadas
+        </button>
+        <button
+          type="button"
+          (click)="setStatusFilter('DECLINED')"
+          class="px-3 py-1.5 rounded-full font-bold transition-all cursor-pointer"
+          [ngClass]="statusFilter() === 'DECLINED' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        >
+          Rechazadas
+        </button>
+        <button
+          type="button"
+          (click)="setStatusFilter('PENDING')"
+          class="px-3 py-1.5 rounded-full font-bold transition-all cursor-pointer"
+          [ngClass]="statusFilter() === 'PENDING' ? 'bg-amber-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+        >
+          Pendientes
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Tabla Elevada de Transacciones -->
+    <div class="bg-white rounded-[32px] p-6 shadow-xs border border-slate-200/80 overflow-hidden">
+      
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+              <th class="pb-3 px-3">Referencia / ID WOMPI</th>
+              <th class="pb-3 px-3">Cliente / Acudiente</th>
+              <th class="pb-3 px-3">Plan Suscrito</th>
+              <th class="pb-3 px-3">Monto (COP)</th>
+              <th class="pb-3 px-3">Método</th>
+              <th class="pb-3 px-3">Estado</th>
+              <th class="pb-3 px-3 text-right">Fecha</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-xs">
+            
+            <tr *ngIf="commercialService.isLoading()">
+              <td colspan="7" class="py-8 text-center text-slate-400">
+                <div class="inline-flex items-center gap-2">
+                  <svg class="w-4 h-4 animate-spin text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  <span>Consultando transacciones WOMPI...</span>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="!commercialService.isLoading() && !commercialService.wompiSubscriptions().length">
+              <td colspan="7" class="py-8 text-center text-slate-400">
+                No se registraron transacciones que coincidan con los filtros.
+              </td>
+            </tr>
+
+            <tr
+              *ngFor="let sub of commercialService.wompiSubscriptions()"
+              class="hover:bg-slate-50/80 transition-colors"
+            >
+              <!-- Referencia -->
+              <td class="py-3.5 px-3">
+                <span class="block font-bold text-slate-900 font-mono text-[11px]">{{ sub.reference }}</span>
+                <span class="block text-[10px] text-slate-400 font-mono">{{ sub.wompi_transaction_id || 'ID pendiente' }}</span>
+              </td>
+
+              <!-- Cliente -->
+              <td class="py-3.5 px-3">
+                <span class="block font-semibold text-slate-800">{{ sub.user?.first_name }} {{ sub.user?.last_name }}</span>
+                <span class="block text-[11px] text-slate-400">{{ sub.user?.email }}</span>
+              </td>
+
+              <!-- Plan -->
+              <td class="py-3.5 px-3">
+                <span class="block font-semibold text-slate-800">{{ sub.plan?.name }}</span>
+                <span class="block text-[10px] text-slate-400 uppercase tracking-wider">{{ sub.plan?.type }}</span>
+              </td>
+
+              <!-- Monto -->
+              <td class="py-3.5 px-3 font-bold text-slate-900 font-mono">
+                ${{ (+sub.amount).toLocaleString('es-CO') }}
+              </td>
+
+              <!-- Método de Pago -->
+              <td class="py-3.5 px-3">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-slate-100 text-slate-700">
+                  {{ sub.payment_method || 'CARD' }}
+                </span>
+              </td>
+
+              <!-- Estado -->
+              <td class="py-3.5 px-3">
+                <span
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                  [ngClass]="sub.status === 'APPROVED' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : (sub.status === 'PENDING' ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-rose-50 text-rose-700 border border-rose-100')"
+                >
+                  {{ sub.status }}
+                </span>
+              </td>
+
+              <!-- Fecha -->
+              <td class="py-3.5 px-3 text-right text-slate-400 font-mono text-[11px]">
+                {{ sub.created_at ? sub.created_at.slice(0, 10) : 'Sin fecha' }}
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginador Inferior -->
+      <div class="pt-5 border-t border-slate-100 mt-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div>
+          Mostrando página <strong>{{ commercialService.wompiSubscriptionsMeta().current_page }}</strong> de <strong>{{ commercialService.wompiSubscriptionsMeta().last_page }}</strong>
+          (Total: {{ commercialService.wompiSubscriptionsMeta().total }} transacciones)
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            (click)="onPageChange(currentPage() - 1)"
+            [disabled]="currentPage() <= 1"
+            class="px-3.5 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 transition-all cursor-pointer font-semibold"
+          >
+            Anterior
+          </button>
+
+          <span class="px-2 font-bold text-slate-700">
+            {{ currentPage() }}
+          </span>
+
+          <button
+            type="button"
+            (click)="onPageChange(currentPage() + 1)"
+            [disabled]="currentPage() >= commercialService.wompiSubscriptionsMeta().last_page"
+            class="px-3.5 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 transition-all cursor-pointer font-semibold"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Modal para Crear / Editar Plan -->
+  <app-plan-modal
+    [isOpen]="isPlanModalOpen()"
+    [plan]="selectedPlan()"
+    (close)="closePlanModal()"
+    (planSaved)="onPlanSaved()"
+  ></app-plan-modal>
+
+</div>

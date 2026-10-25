@@ -1,0 +1,205 @@
+<section class="atmosphere">
+  <div class="wrap">
+    
+    <!-- Cabecera Editorial Bebé Genial -->
+    <div class="head">
+      <div class="brand-logo-wrap">
+        <img
+          src="/images/logobebe.png"
+          alt="Bebé Genial"
+          class="brand-logo"
+          onerror="this.style.display='none'"
+        />
+      </div>
+
+      <p class="kicker">Plataforma de aprendizaje</p>
+      <h1>Accede a tu <span class="editorial-emphasis">Bebé Digital</span></h1>
+      <p class="subtitle">Entra a tu plataforma de cuentos bilingües, Smartcards interactivas y actividades pedagógicas.</p>            
+    </div>
+
+    <!-- Formulario de Acceso -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="card" novalidate id="form-login">
+      
+      <!-- Banner de Error si falla la autenticación -->
+      @if (errorMessage()) {
+        <div class="alert-banner">
+          <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div>
+            {{ errorMessage() }}
+          </div>
+        </div>
+      }
+
+      <!-- Campo Correo Electrónico -->
+      <label class="field">
+        <span class="field-label">Correo electrónico</span>
+        <input
+          id="email"
+          class="input"
+          name="correo"
+          type="email"
+          formControlName="email"
+          placeholder="tu@email.com"
+          required
+          autocomplete="email"
+          [class.is-invalid]="loginForm.get('email')?.touched && loginForm.get('email')?.invalid"
+        />
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')) {
+          <div class="field-error">El correo electrónico es requerido.</div>
+        }
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.hasError('email')) {
+          <div class="field-error">Ingresa un correo electrónico válido.</div>
+        }
+      </label>
+
+      <!-- Campo Contraseña -->
+      <label class="field">
+        <span class="field-label">Contraseña</span>
+        <div class="input-wrapper">
+          <input
+            id="password"
+            class="input"
+            [type]="showPassword() ? 'text' : 'password'"
+            name="contraseña"
+            formControlName="password"
+            placeholder="••••••••"
+            required
+            autocomplete="current-password"
+            [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+            style="padding-right: 2.75rem;"
+          />
+          <button
+            type="button"
+            (click)="togglePasswordVisibility()"
+            class="password-toggle-btn"
+            aria-label="Alternar visibilidad de contraseña"
+          >
+            @if (showPassword()) {
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+              </svg>
+            } @else {
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            }
+          </button>
+        </div>
+        @if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')) {
+          <div class="field-error">La contraseña es requerida.</div>
+        }
+      </label>
+
+      <!-- Recordarme -->
+      <label class="remember">
+        <input type="checkbox" formControlName="remember" value="1" />
+        <span>Recordarme en este dispositivo</span>
+      </label>
+
+      <!-- Botón Iniciar Sesión -->
+      <button
+        type="submit"
+        name="entrar"
+        [disabled]="authService.isLoading()"
+        class="btn"
+      >
+        @if (authService.isLoading()) {
+          <svg class="animate-spin h-5 w-5 text-slate-800 mr-2" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>Iniciando sesión...</span>
+        } @else {
+          <span>Iniciar sesión</span>
+        }
+      </button>
+
+      <!-- Fila Olvidaste tu Contraseña -->
+      <div class="forgot-row">
+        <button type="button" class="forgot" (click)="openForgotModal()">
+          ¿Olvidaste tu contraseña?
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Texto Legal -->
+    <p class="legal">
+      Al iniciar sesión aceptas los términos de la plataforma bebegenial.com. ¿Aún no tienes cuenta? <a href="#">Solicita una asesoría</a>.
+    </p>
+
+  </div>
+</section>
+
+<!-- Modal: Recuperación de Contraseña (sign-in.php) -->
+@if (showForgotModal()) {
+  <div class="modal-backdrop">
+    <div class="modal-dialog">
+      <button
+        type="button"
+        (click)="closeForgotModal()"
+        class="modal-close-btn"
+        aria-label="Cerrar modal"
+      >
+        &times;
+      </button>
+
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <p class="kicker" style="margin-bottom: 0.5rem;">Recuperación</p>
+        <h2 style="font-family: var(--font-display); font-weight: 600; color: var(--color-ink-deep); font-size: 1.75rem; margin: 0 0 0.5rem; letter-spacing: -0.02em;">
+          ¿Olvidaste tu contraseña?
+        </h2>
+        <p class="subtitle" style="font-size: 0.9rem;">
+          Ingresa tu correo electrónico registrado y te enviaremos un enlace seguro para restablecerla.
+        </p>
+      </div>
+
+      @if (forgotSuccessMessage()) {
+        <div class="alert-banner" style="background-color: #f0fdf4; border-color: #bbf7d0; color: #166534; margin-bottom: 1rem;">
+          {{ forgotSuccessMessage() }}
+        </div>
+        <button
+          type="button"
+          (click)="closeForgotModal()"
+          class="btn"
+          style="background: #e2e8f0; color: #334155; margin-top: 1rem;"
+        >
+          Cerrar
+        </button>
+      } @else {
+        <form [formGroup]="forgotForm" (ngSubmit)="onForgotSubmit()" style="margin-top: 1.25rem;">
+          <label class="field" style="margin-bottom: 1.25rem;">
+            <span class="field-label">Correo electrónico</span>
+            <input
+              class="input"
+              type="email"
+              formControlName="forgotEmail"
+              placeholder="tu@email.com"
+              required
+              autocomplete="email"
+            />
+            @if (forgotForm.get('forgotEmail')?.touched && forgotForm.get('forgotEmail')?.invalid) {
+              <div class="field-error">Ingresa un correo electrónico válido.</div>
+            }
+          </label>
+
+          <button
+            class="btn"
+            type="submit"
+            [disabled]="isForgotSubmitting()"
+            style="margin-top: 0.5rem;"
+          >
+            @if (isForgotSubmitting()) {
+              <span>Enviando...</span>
+            } @else {
+              <span>Enviar enlace de recuperación</span>
+            }
+          </button>
+        </form>
+      }
+    </div>
+  </div>
+}

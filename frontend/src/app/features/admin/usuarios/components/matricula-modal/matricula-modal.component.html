@@ -1,0 +1,196 @@
+<!-- Backdrop Oscurecido Sutilmente -->
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 bg-slate-900/30 backdrop-blur-xs z-50 transition-opacity"
+  (click)="onClose()"
+></div>
+
+<!-- Modal Dialog Centrado (Pure Light Theme) -->
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+>
+  <div
+    class="w-full max-w-lg bg-white rounded-[32px] shadow-2xl border border-slate-200/80 overflow-hidden animate-in zoom-in-95 duration-200"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Cabecera del Modal -->
+    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 leading-tight">
+            Asignar o Renovar Matrícula
+          </h3>
+          <p class="text-xs text-slate-400">
+            Alumno: <strong>{{ user?.full_name }}</strong> (ID #{{ user?.id }})
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        (click)="onClose()"
+        class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+        title="Cerrar ventana"
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Formulario -->
+    <form (ngSubmit)="onSubmit()" class="p-6 space-y-5">
+
+      <div *ngIf="errorMessage()" class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
+        {{ errorMessage() }}
+      </div>
+
+      <!-- Selección de Curso -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">
+          Curso a Asignar
+        </label>
+        <select
+          name="course_id"
+          [(ngModel)]="form.course_id"
+          required
+          class="w-full px-4 py-2.5 text-xs sm:text-sm rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+        >
+          <option *ngFor="let course of courses" [value]="course.id">
+            {{ course.id }} — {{ course.title }} ({{ course.hours || 0 }} hrs)
+          </option>
+        </select>
+      </div>
+
+      <!-- Tipo de Acceso (FULL vs FREEMIUM) -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+          Modalidad de Acceso
+        </label>
+        <div class="grid grid-cols-2 gap-3">
+          <label
+            class="p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between"
+            [ngClass]="form.access_type === 'FULL' ? 'bg-emerald-50/60 border-emerald-500 ring-2 ring-emerald-500/10' : 'bg-slate-50 border-slate-200 hover:bg-slate-100/70'"
+          >
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-bold text-slate-900">Acceso Completo</span>
+              <input
+                type="radio"
+                name="access_type"
+                value="FULL"
+                [(ngModel)]="form.access_type"
+                class="text-emerald-600 focus:ring-emerald-500"
+              />
+            </div>
+            <span class="text-[11px] text-slate-500">Ilimitado a todos los recursos del curso</span>
+          </label>
+
+          <label
+            class="p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between"
+            [ngClass]="form.access_type === 'FREEMIUM' ? 'bg-emerald-50/60 border-emerald-500 ring-2 ring-emerald-500/10' : 'bg-slate-50 border-slate-200 hover:bg-slate-100/70'"
+          >
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-bold text-slate-900">Con Cuota / Límite</span>
+              <input
+                type="radio"
+                name="access_type"
+                value="FREEMIUM"
+                [(ngModel)]="form.access_type"
+                class="text-emerald-600 focus:ring-emerald-500"
+              />
+            </div>
+            <span class="text-[11px] text-slate-500">Restringido a un número fijo de cuentos</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Límite de Libros (solo si es FREEMIUM) -->
+      <div *ngIf="form.access_type === 'FREEMIUM'" class="bg-amber-50/60 rounded-2xl p-4 border border-amber-200/60 animate-in fade-in duration-200">
+        <label class="block text-xs font-bold text-amber-900 mb-1">
+          Límite de Libros (Cuentos Leo con LEO)
+        </label>
+        <div class="flex items-center gap-3">
+          <input
+            type="number"
+            name="book_limit"
+            [(ngModel)]="form.book_limit"
+            min="1"
+            max="100"
+            class="w-28 px-3.5 py-2 text-xs rounded-xl bg-white border border-amber-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
+          />
+          <span class="text-xs text-amber-800 font-medium">cuentos permitidos</span>
+        </div>
+      </div>
+
+      <!-- Duración / Vigencia -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+          Vigencia del Acceso
+        </label>
+        <div class="grid grid-cols-4 gap-2">
+          <button
+            type="button"
+            (click)="form.duration_type = '30'"
+            class="py-2 px-1 text-center rounded-xl text-xs font-bold transition-all border cursor-pointer"
+            [ngClass]="form.duration_type === '30' ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
+          >
+            30 Días
+          </button>
+          <button
+            type="button"
+            (click)="form.duration_type = '90'"
+            class="py-2 px-1 text-center rounded-xl text-xs font-bold transition-all border cursor-pointer"
+            [ngClass]="form.duration_type === '90' ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
+          >
+            3 Meses
+          </button>
+          <button
+            type="button"
+            (click)="form.duration_type = '180'"
+            class="py-2 px-1 text-center rounded-xl text-xs font-bold transition-all border cursor-pointer"
+            [ngClass]="form.duration_type === '180' ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
+          >
+            6 Meses
+          </button>
+          <button
+            type="button"
+            (click)="form.duration_type = '365'"
+            class="py-2 px-1 text-center rounded-xl text-xs font-bold transition-all border cursor-pointer"
+            [ngClass]="form.duration_type === '365' ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
+          >
+            1 Año
+          </button>
+        </div>
+      </div>
+
+      <!-- Pie del Modal con Botones -->
+      <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          (click)="onClose()"
+          class="px-4 py-2.5 rounded-full text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="isSaving()"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+        >
+          <svg *ngIf="isSaving()" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>{{ isSaving() ? 'Asignando...' : 'Asignar Matrícula' }}</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

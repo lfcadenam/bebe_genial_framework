@@ -1,0 +1,133 @@
+@if (isOpen) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-200">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200/80 flex flex-col max-h-[92vh] overflow-hidden animate-in zoom-in-95 duration-200">
+      
+      <!-- Cabecera -->
+      <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-base font-extrabold text-slate-900">Personalizar Plantilla de Correo</h3>
+            <p class="text-xs text-slate-500 font-medium">Configura el asunto y cuerpo con marcadores dinámicos</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          (click)="onClose()"
+          class="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Formulario -->
+      <form (ngSubmit)="onSubmit()" class="flex-1 overflow-y-auto p-6 space-y-4">
+        @if (errorMessage()) {
+          <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nombre de la Plantilla *</label>
+            <input
+              type="text"
+              [(ngModel)]="form.name"
+              name="name"
+              required
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Identificador (Slug)</label>
+            <input
+              type="text"
+              [value]="template?.slug"
+              disabled
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-500 font-mono text-xs focus:outline-none"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Asunto del Correo (Subject) *</label>
+          <input
+            type="text"
+            [(ngModel)]="form.subject"
+            name="subject"
+            required
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
+          />
+        </div>
+
+        <!-- Marcadores dinámicos disponibles -->
+        @if (template?.available_variables && template?.available_variables?.length) {
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Variables Dinámicas Disponibles (haz clic para insertar):</span>
+            <div class="flex flex-wrap gap-1.5">
+              @for (v of template?.available_variables; track v) {
+                <button
+                  type="button"
+                  (click)="insertVariable(v)"
+                  class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-[11px] font-mono text-emerald-700 font-bold hover:bg-emerald-50 hover:border-emerald-200 transition-colors shadow-2xs cursor-pointer"
+                >
+                  {{ v }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Cuerpo del Mensaje (HTML / Texto) *</label>
+          <textarea
+            [(ngModel)]="form.body_html"
+            name="body_html"
+            rows="8"
+            required
+            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+          ></textarea>
+        </div>
+      </form>
+
+      <!-- Pie de Acciones -->
+      <div class="p-6 border-t border-slate-100 flex items-center justify-end gap-3 bg-slate-50/50">
+        <button
+          type="button"
+          (click)="onClose()"
+          class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold text-xs hover:bg-slate-100 transition-colors"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="onSubmit()"
+          [disabled]="isSaving()"
+          class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs shadow-md shadow-emerald-500/20 disabled:opacity-50 transition-all flex items-center gap-2"
+        >
+          @if (isSaving()) {
+            <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            <span>Guardando...</span>
+          } @else {
+            <span>Guardar Cambios</span>
+          }
+        </button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -1,0 +1,184 @@
+<!-- Backdrop Oscurecido Sutilmente -->
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 bg-slate-900/30 backdrop-blur-xs z-50 transition-opacity"
+  (click)="onClose()"
+></div>
+
+<!-- Modal Dialog Centrado (Pure Light Theme) -->
+<div
+  *ngIf="isOpen"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
+>
+  <div
+    class="w-full max-w-lg bg-white rounded-[32px] shadow-2xl border border-slate-200/80 overflow-hidden animate-in zoom-in-95 duration-200"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Cabecera del Modal -->
+    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 leading-tight">
+            {{ plan ? 'Editar Plan de Pago' : 'Nuevo Plan de Suscripción' }}
+          </h3>
+          <p class="text-xs text-slate-400">
+            Integración Pasarela WOMPI Bancolombia
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        (click)="onClose()"
+        class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+        title="Cerrar ventana"
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Formulario -->
+    <form (ngSubmit)="onSubmit()" class="p-6 space-y-4 max-h-[calc(100vh-12rem)] overflow-y-auto">
+
+      <div *ngIf="errorMessage()" class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-semibold">
+        {{ errorMessage() }}
+      </div>
+
+      <!-- Nombre del Plan -->
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Nombre del Plan <span class="text-rose-500">*</span></label>
+        <input
+          type="text"
+          name="name"
+          [(ngModel)]="form.name"
+          required
+          placeholder="Ej: Plan Anual Bebé Genial, Suscripción Mensual Leo"
+          class="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+        />
+      </div>
+
+      <!-- Tipo de Cobro y Precio -->
+      <div class="grid grid-cols-2 gap-3.5">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Modalidad de Cobro</label>
+          <select
+            name="type"
+            [(ngModel)]="form.type"
+            class="w-full px-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-medium"
+          >
+            <option value="recurring">Recurrente (Suscripción Automática)</option>
+            <option value="single">Único (Pago por una sola vez)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Precio (COP) <span class="text-rose-500">*</span></label>
+          <input
+            type="number"
+            name="price"
+            [(ngModel)]="form.price"
+            min="0"
+            step="100"
+            required
+            placeholder="49900"
+            class="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-mono"
+          />
+        </div>
+      </div>
+
+      <!-- Duración y Días de Prueba -->
+      <div class="grid grid-cols-2 gap-3.5">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Duración (Meses) <span class="text-rose-500">*</span></label>
+          <input
+            type="number"
+            name="duration_months"
+            [(ngModel)]="form.duration_months"
+            min="1"
+            max="120"
+            required
+            class="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Días de Prueba Gratis</label>
+          <input
+            type="number"
+            name="trial_days"
+            [(ngModel)]="form.trial_days"
+            min="0"
+            max="30"
+            class="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+          />
+        </div>
+      </div>
+
+      <!-- Cursos Incluidos -->
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Cursos Incluidos en este Plan</label>
+        <div class="space-y-1.5 max-h-36 overflow-y-auto pr-1 border border-slate-200 rounded-xl p-2 bg-slate-50/50">
+          <div
+            *ngFor="let course of courses()"
+            (click)="toggleCourse(course.id)"
+            class="p-2 rounded-lg flex items-center justify-between cursor-pointer transition-colors"
+            [ngClass]="isCourseSelected(course.id) ? 'bg-emerald-100/70 text-emerald-900 font-semibold' : 'hover:bg-slate-100 text-slate-700'"
+          >
+            <div class="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                [checked]="isCourseSelected(course.id)"
+                (click)="$event.stopPropagation(); toggleCourse(course.id)"
+                class="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              />
+              <span>{{ course.title }}</span>
+            </div>
+            <span class="text-[10px] text-slate-400 font-mono">{{ course.hours || 0 }}h</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Beneficios -->
+      <div>
+        <label class="block text-xs font-medium text-slate-600 mb-1">Beneficios / Descripción Comercial</label>
+        <textarea
+          name="benefits"
+          [(ngModel)]="form.benefits"
+          rows="2"
+          placeholder="Acceso total a las inteligencias múltiples, biblioteca de cuentos ilimitada..."
+          class="w-full px-3.5 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium"
+        ></textarea>
+      </div>
+
+      <!-- Pie del Modal con Botones -->
+      <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          (click)="onClose()"
+          class="px-4 py-2.5 rounded-full text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          [disabled]="isSaving()"
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold shadow-md shadow-emerald-500/25 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
+        >
+          <svg *ngIf="isSaving()" class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span>{{ isSaving() ? 'Guardando...' : (plan ? 'Actualizar Plan' : 'Crear Plan') }}</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
