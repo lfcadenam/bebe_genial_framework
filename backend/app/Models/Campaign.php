@@ -18,6 +18,7 @@ class Campaign extends Model
         'code',
         'name',
         'book_limit',
+        'cuentos_permitidos',
         'duration_days',
         'starts_at',
         'ends_at',
@@ -28,6 +29,7 @@ class Campaign extends Model
     {
         return [
             'book_limit' => 'integer',
+            'cuentos_permitidos' => 'array',
             'duration_days' => 'integer',
             'starts_at' => 'date:Y-m-d',
             'ends_at' => 'date:Y-m-d',

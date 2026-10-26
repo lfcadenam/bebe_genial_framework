@@ -1,35 +1,40 @@
 @if (isOpen) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-200">
-    <div class="bg-white rounded-3xl w-full max-w-lg shadow-xl border border-slate-200/80 overflow-hidden flex flex-col max-h-[90vh]">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-200">
+    <div class="bg-white rounded-[32px] w-full max-w-lg shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col max-h-[92vh]">
       
-      <!-- Cabecera -->
-      <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+      <!-- ==================== CABECERA OSCURA OBSIDIANA ==================== -->
+      <div class="bg-[#0f172a] px-6 py-5 flex items-center justify-between text-white">
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-500/20 text-[#00C975] flex items-center justify-center border border-emerald-500/30 shrink-0">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
           </div>
           <div>
-            <h3 class="text-base font-extrabold text-slate-900">
-              {{ partner ? 'Editar Aliado B2B' : 'Nuevo Aliado / Origen API' }}
+            <h3 class="text-base font-bold text-white leading-tight">
+              {{ partner ? 'Editar Plataforma B2B' : 'Registrar Nueva Plataforma B2B' }}
             </h3>
-            <p class="text-xs text-slate-500 font-medium">Credenciales y control de acceso externo</p>
+            <p class="text-xs text-slate-400 font-normal mt-0.5">
+              Se activará automáticamente y generará su credencial API
+            </p>
           </div>
         </div>
+
         <button
           type="button"
           (click)="onClose()"
-          class="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+          class="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-colors shrink-0"
+          title="Cerrar modal"
         >
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
-      <!-- Formulario -->
-      <form (ngSubmit)="onSubmit()" class="flex-1 overflow-y-auto p-6 space-y-4">
+      <!-- ==================== CUERPO DEL FORMULARIO ==================== -->
+      <form (ngSubmit)="onSubmit()" class="flex-1 overflow-y-auto p-6 sm:p-7 space-y-4">
+        
         @if (errorMessage()) {
           <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
             <svg class="w-4 h-4 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -39,94 +44,175 @@
           </div>
         }
 
+        <!-- Tarjeta Código de Origen (Autonumérico) -->
+        <div class="border border-dashed border-slate-300 rounded-2xl p-4 flex items-center justify-between bg-white">
+          <div class="pr-3">
+            <h4 class="text-xs font-bold text-slate-800">Código de Origen (Autonumérico)</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">
+              Asignado automáticamente para el campo <span class="text-rose-500 font-mono font-semibold">origen</span> en el API.
+            </p>
+          </div>
+          <div class="px-3.5 py-1.5 rounded-xl bg-emerald-100/80 text-emerald-800 font-black text-sm shrink-0">
+            #{{ originCode }}
+          </div>
+        </div>
+
+        <!-- Nombre de la Empresa o Plataforma -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Nombre de la Plataforma / Aliado *</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">
+            Nombre de la Empresa o Plataforma *
+          </label>
           <input
             type="text"
             [(ngModel)]="form.name"
             name="name"
             required
-            placeholder="Ej. Colsubsidio Educación"
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
+            placeholder="Ej: Colsubsidio, Sura, App Bebé Genial"
+            class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-800 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
           />
         </div>
 
+        <!-- Código Slug Único -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Código Slug Único *</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1.5">
+            Código Slug Único *
+          </label>
           <input
             type="text"
             [(ngModel)]="form.partner_code"
             name="partner_code"
             required
-            placeholder="Ej. colsubsidio"
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
+            placeholder="Ej: colsubsidio, sura_seguros"
+            class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-800 text-xs sm:text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
           />
-          <p class="text-[11px] text-slate-400 mt-1">Solo letras minúsculas, números y guiones bajos.</p>
+          <p class="text-[11px] text-slate-400 mt-1">Identificador interno sin espacios para trazabilidad.</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Tarjeta Integración GoHighLevel (GHL) - Opcional -->
+        <div class="rounded-2xl bg-[#F4F7FC] p-4 sm:p-5 border border-slate-200/70 space-y-3.5">
+          <div class="flex items-start gap-2.5">
+            <div class="w-5 h-5 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div>
+              <h5 class="text-xs font-bold text-slate-800">Integración GoHighLevel (GHL) - Opcional</h5>
+              <p class="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                Si este aliado conecta con GHL, configura el Access Token y la etiqueta a asignar tras cada registro exitoso.
+              </p>
+            </div>
+          </div>
+
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Persona de Contacto</label>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">
+              Token API GHL (Bearer Access Token)
+            </label>
             <input
               type="text"
-              [(ngModel)]="form.contact_name"
-              name="contact_name"
-              placeholder="Ej. Dr. Carlos Pardo"
-              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              [(ngModel)]="form.ghl_access_token"
+              name="ghl_access_token"
+              placeholder="Bearer eyJhbGciOi..."
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
             />
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Correo de Contacto</label>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">
+              Etiqueta GHL
+            </label>
             <input
-              type="email"
-              [(ngModel)]="form.contact_email"
-              name="contact_email"
-              placeholder="contacto@alianza.com"
-              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              type="text"
+              [(ngModel)]="form.etiqueta"
+              name="etiqueta"
+              placeholder="Ej: cliente-comprador"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all placeholder:text-slate-400"
             />
+            <p class="text-[11px] text-slate-400 mt-1">Etiqueta aplicada al CONTACT_ID recibido en el webhook.</p>
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Lista Blanca de IPs (Opcional)</label>
-          <textarea
-            [(ngModel)]="form.ip_whitelist"
-            name="ip_whitelist"
-            rows="3"
-            placeholder="Una dirección IP por línea (Ej: 190.14.25.1)"
-            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-          ></textarea>
-          <p class="text-[11px] text-slate-400 mt-1">Si se deja vacío, se permitirán solicitudes desde cualquier dirección IP.</p>
-        </div>
+        <!-- Acordeón Opcional: Whitelist de IPs y Contacto -->
+        <div class="pt-1">
+          <button
+            type="button"
+            (click)="showAdvanced.update(v => !v)"
+            class="text-xs font-semibold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <span>Configuración Adicional (IP Whitelist & Contacto)</span>
+            <svg class="w-3.5 h-3.5 transition-transform" [class.rotate-180]="showAdvanced()" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
 
-        @if (partner) {
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Estado</label>
-            <select
-              [(ngModel)]="form.status"
-              name="status"
-              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-white"
-            >
-              <option value="active">Activo</option>
-              <option value="inactive">Inactivo</option>
-            </select>
-          </div>
-        }
+          @if (showAdvanced()) {
+            <div class="mt-3 p-4 bg-slate-50 rounded-2xl border border-slate-200/60 space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Persona de Contacto</label>
+                  <input
+                    type="text"
+                    [(ngModel)]="form.contact_name"
+                    name="contact_name"
+                    placeholder="Ej. Dr. Carlos Pardo"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Correo de Contacto</label>
+                  <input
+                    type="email"
+                    [(ngModel)]="form.contact_email"
+                    name="contact_email"
+                    placeholder="contacto@alianza.com"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Lista Blanca de IPs (Opcional)</label>
+                <textarea
+                  [(ngModel)]="form.ip_whitelist"
+                  name="ip_whitelist"
+                  rows="2"
+                  placeholder="Una IP por línea (Ej: 190.14.25.1)"
+                  class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                ></textarea>
+                <p class="text-[10px] text-slate-400 mt-0.5">Si se deja vacío, permite cualquier IP.</p>
+              </div>
+
+              @if (partner) {
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">Estado</label>
+                  <select
+                    [(ngModel)]="form.status"
+                    name="status"
+                    class="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  >
+                    <option value="active">Activo</option>
+                    <option value="inactive">Inactivo</option>
+                  </select>
+                </div>
+              }
+            </div>
+          }
+        </div>
 
         <!-- Botones de Acción -->
         <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
           <button
             type="button"
             (click)="onClose()"
-            class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold text-xs hover:bg-slate-50 transition-colors"
+            class="px-7 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
           >
             Cancelar
           </button>
           <button
             type="submit"
             [disabled]="isSaving()"
-            class="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs shadow-md shadow-emerald-500/20 disabled:opacity-50 transition-all flex items-center gap-2"
+            class="px-7 py-2.5 rounded-full bg-[#00C975] hover:bg-[#00b067] text-white font-bold text-xs shadow-md shadow-emerald-500/25 transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             @if (isSaving()) {
               <svg class="animate-spin w-4 h-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -135,10 +221,11 @@
               </svg>
               <span>Guardando...</span>
             } @else {
-              <span>{{ partner ? 'Actualizar Aliado' : 'Guardar y Activar' }}</span>
+              <span>{{ partner ? 'Actualizar Plataforma' : 'Crear y Generar Credenciales' }}</span>
             }
           </button>
         </div>
+
       </form>
     </div>
   </div>

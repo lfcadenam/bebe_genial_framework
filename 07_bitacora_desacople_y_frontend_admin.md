@@ -196,5 +196,98 @@ Se completó con éxito la migración escalonada del frontend desde **Angular 19
 3. **Estabilidad de Testing y Entorno Seguro (`src/test.ts`):**
    * Configuración de inicialización del entorno de pruebas (`initTestEnvironment`) con teardown controlado para evitar fugas de suscripciones asíncronas en Karma.
    * Nuevo script de ejecución única sin modo escucha: `npm run test:ci`.
-   * **Métricas Finales en Angular 21:** **52 de 52 pruebas unitarias exitosas (100% Green)** en **0.99 segundos**.
+   * **Métricas Finales en Angular 21:** **54 de 54 pruebas unitarias exitosas (100% Green)**.
+
+---
+
+## 8. Migración & Modernización Integral de Convenios y Distribuidores (Octubre 2026)
+
+* **Origen Legacy (`D:\xampp\htdocs\aula\admin\distribuidores`):**
+  * `usuarios` con `idperfil = 7` (distribuidor), flags `es_convenio`, campos `codigo_qr`, `pass` y `nombre_distribuidor`.
+  * `distribuidores_cursos` (relación de cursos autorizados para asignación).
+  * `distribuidores_tiempos` (vigencia en meses autorizada para la matrícula).
+  * Alumnos asociados con `idcreador = id_distribuidor` e `idperfil = 4`.
+  * Lógica procedural de exportación Excel (`distribuidor/exportar_excel.php`) y generación QR.
+* **Modelo Moderno y Migración:**
+  * Tabla `commercial_partners` enriquecida con columnas `qr_code` (string único) y `user_id` (vinculación a cuenta de login con rol `distributor`).
+  * Seeder `MigrateLegacyCommercialPartnersSeeder`:
+    * Migró aliado #10951 (*LuisferDeveloper*, distribuidor independiente, cursos `[22, 25]`, 6 meses de vigencia, QR `d9787316ab`, 4 alumnos asociados).
+    * Migró aliado #10959 (*Pruebas*, convenio institucional, curso `[6]`, 1 mes de vigencia, QR `adb61e8fe7`, 0 alumnos asociados).
+    * Migró los 4 alumnos del distribuidor junto con sus perfiles de menor (`BabyProfile`) y matrículas activas/expiradas (`Enrollment`).
+* **Endpoints API Laravel Implementados:**
+  * `POST /api/v1/admin/commercial-partners/{id}/toggle-status`: Alternar estado activo/inactivo con sincronización a usuario.
+  * `POST /api/v1/admin/commercial-partners/{id}/reset-password`: Restablecimiento seguro de contraseña para el distribuidor.
+  * `GET /api/v1/admin/commercial-partners/{id}/qr-code`: Enlace directo de registro (`/registro?dist=...`) y hash QR.
+  * `GET /api/v1/admin/commercial-partners/{id}/export-students`: Streaming de CSV con BOM UTF-8 y columnas exactas del legacy.
+  * `GET /api/v1/admin/commercial-partners/export-all-students`: Exportación consolidada de todos los estudiantes de todos los aliados.
+* **Frontend Angular (Nuvex Modern Curve UI):**
+  * Subcomponente `PartnerQrModalComponent`: visualización de enlace directo con copia en un clic y código QR renderizado.
+  * Subcomponente `PartnerPasswordModalComponent`: cambio o autogeneración de contraseña segura para el distribuidor.
+  * Subcomponente `PartnerStudentsModalComponent`: tabla detallada de estudiantes (tutor, menor, edad textual calculada, cursos, vigencias) y descarga a Excel.
+  * Subcomponente `PartnerDrawerComponent`: creación/edición con presets rápidos de meses (1, 3, 6, 12, 24m) y contraseña inicial.
+  * Validación: **41/41 pruebas PHPUnit pasando** y **54/54 pruebas Karma pasando**.
+
+---
+
+## 9. Modernización & Lógica Integral de Campañas API Leo con LEO (Octubre 2026)
+
+* **Origen Legacy (`D:\xampp\htdocs\aula\admin\api_campanas\campanas.php`):**
+  * Tabla `campanas_leoconleo`: campos `id_partner`, `id_curso`, `codigo_campana`, `nombre`, `limite_cuentos`, `cuentos_permitidos` (JSON de IDs), `vigencia_dias`, `fecha_inicio`, `fecha_fin`, `activo`.
+  * Catálogo de cuentos interactivos para Curso #24 (*Cuentos Leo con LEO*): 12 categorías temáticas (`cuentos`) y 365 cuentos interactivos (`cuentos_menu`) con miniaturas de categorías (`Acuavenruras.png`, `Magia.png`, `Aventureros.png`, etc.).
+  * Selector Split-View procedural: panel izquierdo con las 12 categorías, badges de cuentos seleccionados y toggle de categoría completa; panel derecho con grid de tarjetas de cuentos y buscador global instantáneo.
+  * Lógica de cuotas y asignación:
+    * Si `id_curso == 24` y se seleccionan todos los 365 cuentos: `limite_cuentos = 365` y `cuentos_permitidos = null` (acceso completo).
+    * Si `id_curso == 24` y se selecciona un subconjunto: `limite_cuentos = count(seleccionados)` y `cuentos_permitidos = [id1, id2, ...]`.
+    * Si `id_curso != 24`: `limite_cuentos = 0` y `cuentos_permitidos = null`.
+  * Consulta AJAX de alumnos (`?ajax=usuarios_campana`) y exportación a Excel con cálculo de edad textual del infante.
+* **Backend Laravel 11:**
+  * Migración `2026_10_26_045500_add_cuentos_permitidos_to_campaigns_table.php` (`cuentos_permitidos` tipo JSON nullable en `campaigns`).
+  * `App\Services\CuentosCatalogService`: catálogo de alta eficiencia con las 12 categorías, miniaturas y los 365 cuentos indexados.
+  * Endpoints en `AdminCampaignController`:
+    * `GET /api/v1/admin/campaigns/cuentos-catalog`: entrega las 12 categorías con miniaturas y los 365 cuentos.
+    * `POST /api/v1/admin/campaigns` y `PUT /api/v1/admin/campaigns/{id}`: procesa `cuentos_seleccionados`, aplica validación de selección no vacía, resuelve acceso total vs. cuota personalizada y guarda en base de datos.
+    * `GET /api/v1/admin/campaigns/{id}/students`: consulta paginada y filtrable de alumnos matriculados con datos del tutor, infante, edad textual y vigencia.
+    * `GET /api/v1/admin/campaigns/{id}/export-students`: descarga de archivo CSV con BOM UTF-8 y encabezados exactos del legacy.
+* **Frontend Angular (Nuvex Modern Curve UI):**
+  * Subcomponente `CampaignModalComponent`:
+    * Responsive split-view que se adapta dinámicamente (`max-w-5xl` para Curso #24, `max-w-xl` para otros cursos).
+    * Master panel (izquierda): miniaturas auténticas copiadas a `frontend/public/images/cuentos/`, conteo en vivo `X / total` por categoría y botón de alternado rápido.
+    * Detail panel (derecha): grid de cuentos interactivos con tarjetas elevadas suaves, estados de check en esmeralda Nuvex, badges de página y buscador en tiempo real.
+    * Botones rápidos superiores: "Todos (365)" y "Limpiar Todo".
+  * Subcomponente `CampaignStudentsModalComponent`:
+    * Modal de consulta de alumnos matriculados por campaña con buscador en tiempo real, métricas de estado y botón de exportación CSV a un clic.
+  * Integración en tabla de campañas:
+    * Botón de acceso directo a alumnos en cada fila y badge interactivo de total de matriculados.
+* **Validación Automatizada:**
+  * Backend: **44 de 44 pruebas PHPUnit exitosas (308 aserciones, 100% Green)**.
+  * Frontend: **57 de 57 pruebas Karma exitosas (100% Green)** y build de producción con 0 errores.
+
+---
+
+## 10. Hoja de Ruta Oficial: Estandarización a Slide-Over Drawers (Para Ejecutar Mañana)
+
+### A. Definición del Estándar Oficial Nuvex
+Siguiendo la directriz del usuario y el patrón de referencia implementado en la ficha técnica de usuarios (`user-drawer.component.html`), **se establece como estándar oficial en Nuvex la eliminación de modales flotantes centrados para formularios y vistas de detalle**, reemplazándolos por **Slide-Over Drawers (Paneles Laterales Deslizantes)**:
+
+* **Posición:** Fijado al lateral derecho `fixed inset-y-0 right-0 h-full w-full max-w-xl md:max-w-2xl bg-white shadow-2xl z-50 flex flex-col`.
+* **Backdrop:** Atenuación del fondo principal con desenfoque suave `fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-200`.
+* **Cabecera Fija:** Avatar/Icono temático en cápsula suave `rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100`, título principal en negrita contundente, subtítulo con identificador/metadatos y botón de cierre `[X]`.
+* **Cuerpo Scrollable:** `flex-1 overflow-y-auto p-6 space-y-6`, títulos de sección en verde esmeralda Nuvex (`text-xs font-bold text-emerald-600 uppercase tracking-wider`), campos e inputs con bordes limpios `rounded-xl border-slate-200`.
+* **Pie Fijo (Sticky Footer):** `p-5 border-t border-slate-100 bg-white flex items-center justify-end gap-3 shrink-0` con botones de *"Cancelar"* y *"Guardar Cambios"* en verde esmeralda (`bg-[#00C975]`).
+
+### B. Inventario de Componentes a Migrar Mañana:
+1. **Módulo API Leo con LEO:**
+   - [`PartnerModalComponent`](file:///d:/Users/Usuario/Documents/Nuvex/BebeGenial/frontend/src/app/features/admin/campanas/components/partner-modal/) ➔ `PartnerDrawerComponent` (formulario de aliados B2B).
+   - [`CampaignModalComponent`](file:///d:/Users/Usuario/Documents/Nuvex/BebeGenial/frontend/src/app/features/admin/campanas/components/campaign-modal/) ➔ `CampaignDrawerComponent` (formulario de campañas con split-view de cuentos en panel lateral ancho `max-w-4xl`).
+   - [`CampaignStudentsModalComponent`](file:///d:/Users/Usuario/Documents/Nuvex/BebeGenial/frontend/src/app/features/admin/campanas/components/campaign-students-modal/) ➔ `CampaignStudentsDrawerComponent` (visor lateral de alumnos matriculados).
+   - [`AuditDetailModalComponent`](file:///d:/Users/Usuario/Documents/Nuvex/BebeGenial/frontend/src/app/features/admin/campanas/components/audit-detail-modal/) ➔ `AuditDetailDrawerComponent` (inspector lateral de logs y payloads JSON).
+2. **Módulo Usuarios:**
+   - [`MatriculaModalComponent`](file:///d:/Users/Usuario/Documents/Nuvex/BebeGenial/frontend/src/app/features/admin/usuarios/components/matricula-modal/) ➔ `MatriculaDrawerComponent` (asignación de cursos y cuotas en panel lateral).
+3. **Módulo Comercial WOMPI:**
+   - Formulario de creación/edición de planes Wompi ➔ `WompiPlanDrawerComponent`.
+4. **Excepción de Diálogos Breves:**
+   - [`ConfirmModalComponent`](file:///d:/Users/Usuario/Documents/Nuvex/BebeGenial/frontend/src/app/shared/components/confirm-modal/) se mantiene como diálogo flotante pequeño y centrado con curvas orgánicas `rounded-[32px]`, exclusivamente para confirmaciones críticas o destructivas (ej. "¿Estás seguro de eliminar...?").
+
+
+
 

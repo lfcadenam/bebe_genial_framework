@@ -19,6 +19,8 @@ class ApiPartner extends Model
         'ip_whitelist',
         'contact_name',
         'contact_email',
+        'ghl_access_token',
+        'etiqueta',
         'status',
     ];
 

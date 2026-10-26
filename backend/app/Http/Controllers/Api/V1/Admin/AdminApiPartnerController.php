@@ -81,6 +81,8 @@ class AdminApiPartnerController extends Controller
             'contact_name' => 'nullable|string|max:120',
             'contact_email' => 'nullable|email|max:150',
             'ip_whitelist' => 'nullable|string',
+            'ghl_access_token' => 'nullable|string',
+            'etiqueta' => 'nullable|string|max:100',
             'status' => ['nullable', Rule::in(['active', 'inactive'])],
             'origin_code' => 'nullable|integer|unique:api_partners,origin_code',
         ]);
@@ -96,6 +98,8 @@ class AdminApiPartnerController extends Controller
             'ip_whitelist' => $validated['ip_whitelist'] ?? null,
             'contact_name' => $validated['contact_name'] ?? null,
             'contact_email' => $validated['contact_email'] ?? null,
+            'ghl_access_token' => $validated['ghl_access_token'] ?? null,
+            'etiqueta' => $validated['etiqueta'] ?? null,
             'status' => $validated['status'] ?? 'active',
         ]);
 
@@ -168,6 +172,8 @@ class AdminApiPartnerController extends Controller
             'contact_name' => 'nullable|string|max:120',
             'contact_email' => 'nullable|email|max:150',
             'ip_whitelist' => 'nullable|string',
+            'ghl_access_token' => 'nullable|string',
+            'etiqueta' => 'nullable|string|max:100',
             'status' => ['nullable', Rule::in(['active', 'inactive'])],
         ]);
 
@@ -177,6 +183,8 @@ class AdminApiPartnerController extends Controller
             'contact_name' => $validated['contact_name'] ?? null,
             'contact_email' => $validated['contact_email'] ?? null,
             'ip_whitelist' => $validated['ip_whitelist'] ?? null,
+            'ghl_access_token' => $validated['ghl_access_token'] ?? null,
+            'etiqueta' => $validated['etiqueta'] ?? null,
             'status' => $validated['status'] ?? $partner->status,
         ]);
 

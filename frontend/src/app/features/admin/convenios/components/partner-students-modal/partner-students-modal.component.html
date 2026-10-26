@@ -10,11 +10,11 @@
 @if (isOpen) {
   <div
     class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto"
-    >
+  >
     <div
-      class="w-full max-w-2xl bg-white rounded-[32px] shadow-2xl border border-slate-200/80 overflow-hidden animate-in zoom-in-95 duration-200"
+      class="w-full max-w-4xl bg-white rounded-[32px] shadow-2xl border border-slate-200/80 overflow-hidden animate-in zoom-in-95 duration-200"
       (click)="$event.stopPropagation()"
-      >
+    >
       <!-- Cabecera del Modal -->
       <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
         <div class="flex items-center gap-3">
@@ -25,24 +25,48 @@
           </div>
           <div>
             <h3 class="text-base font-extrabold text-slate-900 leading-tight">
-              Alumnos Matriculados por {{ partner?.company_name }}
+              Alumnos Registrados por {{ partner?.company_name }}
             </h3>
             <p class="text-xs text-slate-400">
-              Total en sistema: <strong>{{ meta().total }}</strong> alumnos vinculados
+              Total en sistema: <strong>{{ meta().total }}</strong> alumnos matriculados
             </p>
           </div>
         </div>
-        <button
-          type="button"
-          (click)="onClose()"
-          class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-          title="Cerrar ventana"
+
+        <div class="flex items-center gap-2">
+          <!-- Botón Exportar a Excel -->
+          <button
+            type="button"
+            (click)="exportToExcel()"
+            [disabled]="isExporting() || meta().total === 0"
+            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 transition-all cursor-pointer shadow-xs"
+            title="Exportar listado a Excel / CSV"
           >
-          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+            @if (isExporting()) {
+              <svg class="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            } @else {
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+            }
+            <span>Excel</span>
+          </button>
+
+          <button
+            type="button"
+            (click)="onClose()"
+            class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Cerrar ventana"
+          >
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
+
       <!-- Buscador Interno -->
       <div class="p-6 pb-2">
         <div class="relative">
@@ -53,56 +77,115 @@
             type="text"
             [ngModel]="searchTerm()"
             (ngModelChange)="onSearchChange($event)"
-            placeholder="Buscar alumno por nombre, menor o correo..."
-            class="w-full pl-10 pr-4 py-2 text-xs rounded-full bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
-            />
+            placeholder="Buscar por acudiente, infante o correo..."
+            class="w-full pl-10 pr-4 py-2.5 text-xs rounded-full bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+          />
         </div>
       </div>
+
       <!-- Tabla de Alumnos -->
-      <div class="p-6 pt-2 max-h-96 overflow-y-auto">
+      <div class="p-6 pt-2 max-h-[420px] overflow-y-auto">
         @if (isLoading()) {
           <div class="py-12 text-center text-slate-400 text-xs">
             <div class="inline-flex items-center gap-2">
               <svg class="w-4 h-4 animate-spin text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
-              <span>Cargando alumnos del convenio...</span>
+              <span>Cargando alumnos del distribuidor...</span>
             </div>
           </div>
         }
+
         @if (!isLoading() && !students().length) {
           <div class="py-12 text-center text-slate-400 text-xs">
             No se encontraron alumnos vinculados a este aliado o distribuidor.
           </div>
         }
+
         @if (!isLoading() && students().length) {
-          <div class="space-y-2.5">
-            @for (s of students(); track s) {
-              <div
-                class="p-3 bg-slate-50/70 rounded-2xl border border-slate-100 flex items-center justify-between gap-3 text-xs"
-                >
-                <div class="flex items-center gap-3 min-w-0">
-                  <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center shrink-0 text-xs">
-                    {{ s.first_name ? s.first_name.charAt(0) : 'A' }}
-                  </div>
-                  <div class="min-w-0">
-                    <span class="block font-bold text-slate-800 truncate">{{ s.name || (s.first_name + ' ' + (s.last_name || '')) }}</span>
-                    <span class="block text-[11px] text-slate-400 truncate">{{ s.email }}</span>
-                  </div>
-                </div>
-                <div class="text-right shrink-0">
-                  <span class="block font-semibold text-slate-700 text-[11px]">
-                    {{ s.baby_profile?.full_name || 'Sin bebé' }}
-                  </span>
-                  <span class="block text-[10px] text-emerald-600 font-semibold">
-                    {{ s.enrollments?.length || 0 }} cursos matriculados
-                  </span>
-                </div>
-              </div>
-            }
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <th class="pb-2.5 px-3">Tutor / Acudiente</th>
+                  <th class="pb-2.5 px-3">Infante & Edad</th>
+                  <th class="pb-2.5 px-3">Cursos Matriculados</th>
+                  <th class="pb-2.5 px-3">Vigencia</th>
+                  <th class="pb-2.5 px-3 text-right">Estado</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-xs">
+                @for (s of students(); track s) {
+                  <tr class="hover:bg-slate-50/80 transition-colors">
+                    <!-- Tutor -->
+                    <td class="py-3 px-3">
+                      <span class="block font-bold text-slate-800">
+                        {{ s.name || (s.first_name + ' ' + (s.last_name || '')) }}
+                      </span>
+                      <span class="block text-[11px] text-slate-400">{{ s.email }}</span>
+                      @if (s.phone) {
+                        <span class="block text-[10px] text-slate-400 font-mono">{{ s.phone }}</span>
+                      }
+                    </td>
+
+                    <!-- Infante & Edad -->
+                    <td class="py-3 px-3">
+                      <span class="block font-semibold text-slate-700">
+                        {{ s.baby_profile?.full_name || 'Sin registrar' }}
+                      </span>
+                      <span class="block text-[11px] text-slate-400">
+                        {{ getBabyAge(s.baby_profile?.birth_date) }}
+                      </span>
+                    </td>
+
+                    <!-- Cursos -->
+                    <td class="py-3 px-3">
+                      <div class="flex flex-wrap gap-1 max-w-xs">
+                        @for (enr of s.enrollments; track enr) {
+                          <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                            {{ enr.course?.title || ('Curso #' + enr.course_id) }}
+                          </span>
+                        }
+                        @if (!s.enrollments?.length) {
+                          <span class="text-slate-400 text-[11px]">Sin cursos</span>
+                        }
+                      </div>
+                    </td>
+
+                    <!-- Vigencia -->
+                    <td class="py-3 px-3">
+                      @if (s.enrollments?.[0]?.expires_at) {
+                        <span class="block font-semibold text-slate-700 text-[11px]">
+                          Vence: {{ s.enrollments[0].expires_at | date:'dd/MM/yyyy' }}
+                        </span>
+                        <span class="block text-[10px] text-slate-400">
+                          Matrícula: {{ s.enrollments[0].enrolled_at | date:'dd/MM/yyyy' }}
+                        </span>
+                      } @else {
+                        <span class="text-slate-400 text-[11px]">N/A</span>
+                      }
+                    </td>
+
+                    <!-- Estado -->
+                    <td class="py-3 px-3 text-right">
+                      @if (s.enrollments?.[0]?.expires_at && !isExpired(s.enrollments[0].expires_at)) {
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          Activo
+                        </span>
+                      } @else {
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                          Vencido
+                        </span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         }
       </div>
+
       <!-- Paginador del Modal -->
       <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex items-center justify-between text-xs text-slate-500">
         <div>
@@ -113,16 +196,16 @@
             type="button"
             (click)="onPageChange(meta().current_page - 1)"
             [disabled]="meta().current_page <= 1"
-            class="px-3 py-1 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 transition-all cursor-pointer font-semibold"
-            >
+            class="px-3.5 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 transition-all cursor-pointer font-semibold"
+          >
             Anterior
           </button>
           <button
             type="button"
             (click)="onPageChange(meta().current_page + 1)"
             [disabled]="meta().current_page >= meta().last_page"
-            class="px-3 py-1 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 transition-all cursor-pointer font-semibold"
-            >
+            class="px-3.5 py-1.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 disabled:opacity-40 transition-all cursor-pointer font-semibold"
+          >
             Siguiente
           </button>
         </div>

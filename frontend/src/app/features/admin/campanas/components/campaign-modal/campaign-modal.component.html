@@ -1,20 +1,23 @@
 @if (isOpen) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs transition-opacity animate-in fade-in duration-200">
-    <div class="bg-white rounded-3xl w-full max-w-lg shadow-xl border border-slate-200/80 overflow-hidden flex flex-col max-h-[90vh]">
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/50 backdrop-blur-xs transition-opacity animate-in fade-in duration-200">
+    <div 
+      class="bg-white rounded-[32px] w-full shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col max-h-[92vh] transition-all duration-300"
+      [ngClass]="form.course_id === 24 ? 'max-w-5xl' : 'max-w-xl'"
+    >
       
-      <!-- Cabecera -->
-      <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
+      <!-- Cabecera Nuvex Modern Curve -->
+      <div class="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
+        <div class="flex items-center gap-3.5">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-50 border border-emerald-100/80 flex items-center justify-center text-emerald-600 shadow-xs">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
           </div>
           <div>
-            <h3 class="text-base font-extrabold text-slate-900">
-              {{ campaign ? 'Editar Campaña B2B' : 'Nueva Campaña / Cupos Leo con LEO' }}
+            <h3 class="text-base font-extrabold text-slate-900 tracking-tight">
+              {{ campaign ? 'Editar Campaña B2B' : 'Nueva Campaña Leo con LEO' }}
             </h3>
-            <p class="text-xs text-slate-500 font-medium">Asignación de cuotas de libros y fechas de vigencia</p>
+            <p class="text-xs text-slate-500 font-medium">Configuración de origen, vigencia y cuota de cuentos</p>
           </div>
         </div>
         <button
@@ -28,10 +31,10 @@
         </button>
       </div>
 
-      <!-- Formulario -->
-      <form (ngSubmit)="onSubmit()" class="flex-1 overflow-y-auto p-6 space-y-4">
+      <!-- Formulario Scrollable -->
+      <form (ngSubmit)="onSubmit()" class="flex-1 overflow-y-auto p-6 space-y-4.5">
         @if (errorMessage()) {
-          <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-medium flex items-center gap-2">
+          <div class="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold flex items-center gap-2.5">
             <svg class="w-4 h-4 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
@@ -39,7 +42,8 @@
           </div>
         }
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Datos Primarios -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Código de Campaña *</label>
             <input
@@ -53,7 +57,7 @@
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Aliado / Origen</label>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Aliado / Origen API</label>
             <select
               [(ngModel)]="form.partner_id"
               name="partner_id"
@@ -79,13 +83,14 @@
           />
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Curso Pedagógico *</label>
             <select
-              [(ngModel)]="form.course_id"
+              [ngModel]="form.course_id"
+              (ngModelChange)="onCourseChange($event)"
               name="course_id"
-              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-white"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-white font-medium"
             >
               @for (c of courses(); track c.id) {
                 <option [value]="c.id">{{ c.title }}</option>
@@ -93,24 +98,278 @@
             </select>
           </div>
 
-          <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Límite de Libros / Cuota *</label>
-            <select
-              [(ngModel)]="form.book_limit"
-              name="book_limit"
-              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-white font-semibold"
-            >
-              <option [value]="0">Libros Ilimitados (Sin Restricción)</option>
-              <option [value]="3">3 Libros</option>
-              <option [value]="5">5 Libros</option>
-              <option [value]="10">10 Libros</option>
-              <option [value]="12">12 Libros (1 al mes)</option>
-              <option [value]="24">24 Libros (Colección Completa)</option>
-            </select>
-          </div>
+          @if (form.course_id !== 24) {
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Cuota de Libros</label>
+              <select
+                [(ngModel)]="form.book_limit"
+                name="book_limit"
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all bg-white font-semibold"
+              >
+                <option [value]="0">Libros Ilimitados (Sin Restricción)</option>
+                <option [value]="3">3 Libros</option>
+                <option [value]="5">5 Libros</option>
+                <option [value]="10">10 Libros</option>
+                <option [value]="12">12 Libros</option>
+                <option [value]="24">24 Libros</option>
+              </select>
+            </div>
+          } @else {
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Modalidad de Cupo</label>
+              <div class="px-4 py-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200/80 flex items-center justify-between text-xs">
+                <span class="font-semibold text-emerald-900">
+                  @if (selectedStoryIds().size === totalCatalogStories()) {
+                    Acceso Total ({{ totalCatalogStories() }} cuentos)
+                  } @else {
+                    Cupo Personalizado ({{ selectedStoryIds().size }} cuentos)
+                  }
+                </span>
+                <span class="font-mono font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
+                  {{ selectedStoryIds().size }} / {{ totalCatalogStories() }}
+                </span>
+              </div>
+            </div>
+          }
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <!-- ==================== SPLIT-VIEW SELECTOR DE CUENTOS (CURSO #24) ==================== -->
+        @if (form.course_id === 24) {
+          <div class="mt-4 pt-4 border-t border-slate-100">
+            <!-- Barra Superior del Selector -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+              <div>
+                <div class="flex items-center gap-2">
+                  <h4 class="text-xs font-extrabold text-slate-900 uppercase tracking-wider">
+                    Asignación Interactiva de Cuentos *
+                  </h4>
+                  <span 
+                    class="text-[11px] font-bold px-2.5 py-0.5 rounded-full border"
+                    [ngClass]="selectedStoryIds().size === totalCatalogStories() ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : (selectedStoryIds().size > 0 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200')"
+                  >
+                    @if (selectedStoryIds().size === totalCatalogStories()) {
+                      Acceso Total ({{ totalCatalogStories() }} Cuentos)
+                    } @else {
+                      {{ selectedStoryIds().size }} de {{ totalCatalogStories() }} seleccionados
+                    }
+                  </span>
+                </div>
+                <p class="text-[11px] text-slate-500 font-medium mt-0.5">
+                  Navega por las categorías en el panel izquierdo o usa el buscador para asignar los cuentos de la campaña.
+                </p>
+              </div>
+
+              <!-- Botones Rápidos de Selección -->
+              <div class="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  (click)="selectAllStories(true)"
+                  class="px-3 py-1.5 rounded-xl border border-emerald-300 bg-emerald-50/50 hover:bg-emerald-100/80 text-emerald-700 font-bold text-xs transition-colors flex items-center gap-1.5"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Todos ({{ totalCatalogStories() }})</span>
+                </button>
+                <button
+                  type="button"
+                  (click)="selectAllStories(false)"
+                  class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 font-semibold text-xs transition-colors"
+                >
+                  Limpiar Todo
+                </button>
+              </div>
+            </div>
+
+            <!-- Contenedor Split-View -->
+            <div class="border border-slate-200/90 rounded-2xl overflow-hidden bg-slate-50 flex flex-col md:flex-row h-[420px] shadow-inner">
+              
+              <!-- Master: Panel de Categorías (Izquierda) -->
+              <div class="w-full md:w-68 bg-white border-b md:border-b-0 md:border-r border-slate-200/80 flex flex-col shrink-0">
+                <div class="p-3 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
+                  <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-600">
+                    Categorías ({{ categories().length }})
+                  </span>
+                  <span class="text-[10px] text-slate-400 font-semibold">Selección</span>
+                </div>
+
+                <!-- Buscador Rápido -->
+                <div class="p-2 border-b border-slate-100 bg-white">
+                  <div class="relative">
+                    <input
+                      type="text"
+                      [ngModel]="storySearch()"
+                      (ngModelChange)="storySearch.set($event)"
+                      name="storySearchInput"
+                      placeholder="Buscar por título..."
+                      class="w-full pl-8 pr-6 py-1.5 rounded-lg border border-slate-200 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 transition-all"
+                    />
+                    <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    @if (storySearch()) {
+                      <button 
+                        type="button" 
+                        (click)="storySearch.set('')"
+                        class="absolute right-2 top-1.5 text-slate-400 hover:text-slate-600"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    }
+                  </div>
+                </div>
+
+                <!-- Lista de Categorías Scrollable -->
+                <div class="flex-1 overflow-y-auto divide-y divide-slate-100">
+                  @for (cat of categories(); track cat.id) {
+                    <div
+                      (click)="setActiveCategory(cat.id)"
+                      class="px-3 py-2.5 flex items-center justify-between gap-2 cursor-pointer transition-colors hover:bg-slate-50"
+                      [ngClass]="activeCategoryId() === cat.id && !storySearch() ? 'bg-emerald-500/10 border-l-4 border-emerald-500 font-semibold' : ''"
+                    >
+                      <div class="flex items-center gap-2.5 min-w-0">
+                        <img 
+                          [src]="cat.image_url" 
+                          [alt]="cat.name" 
+                          class="w-7 h-7 rounded-lg object-contain bg-slate-100 p-0.5 shrink-0 border border-slate-200"
+                          (error)="$any($event.target).src = '/images/cuentos/logo-leo-con-leo.png'"
+                        />
+                        <div class="min-w-0">
+                          <p class="text-xs text-slate-800 truncate" [title]="cat.name">{{ cat.name }}</p>
+                          <span class="text-[10px] text-slate-400">
+                            {{ categorySelectedCount(cat.id) }} / {{ cat.total_cuentos }}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        (click)="toggleCategory(cat.id, $event)"
+                        [title]="isCategoryFullySelected(cat.id) ? 'Desmarcar toda la categoría' : 'Marcar toda la categoría'"
+                        class="w-6 h-6 rounded-lg flex items-center justify-center transition-colors shrink-0"
+                        [ngClass]="isCategoryFullySelected(cat.id) ? 'bg-emerald-500 text-white' : (categorySelectedCount(cat.id) > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-400 hover:bg-slate-200')"
+                      >
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Detail: Grid de Cuentos (Derecha) -->
+              <div class="flex-1 bg-white flex flex-col overflow-hidden">
+                <!-- Header de la Categoría Activa -->
+                <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/40 flex items-center justify-between gap-3 shrink-0">
+                  @if (!storySearch()) {
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      @if (activeCategory) {
+                        <img 
+                          [src]="activeCategory.image_url" 
+                          [alt]="activeCategory.name" 
+                          class="w-8 h-8 rounded-lg object-contain bg-white p-0.5 border border-slate-200"
+                          (error)="$any($event.target).src = '/images/cuentos/logo-leo-con-leo.png'"
+                        />
+                        <div class="min-w-0">
+                          <h5 class="text-xs font-bold text-slate-900 truncate">{{ activeCategory.name }}</h5>
+                          <span class="text-[10px] text-slate-500">
+                            {{ categorySelectedCount(activeCategory.id) }} de {{ activeCategory.total_cuentos }} seleccionados
+                          </span>
+                        </div>
+                      }
+                    </div>
+
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        (click)="markActiveCategory(true)"
+                        class="px-2.5 py-1 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 text-[11px] font-bold hover:bg-emerald-100 transition-colors"
+                      >
+                        + Marcar Todos
+                      </button>
+                      <button
+                        type="button"
+                        (click)="markActiveCategory(false)"
+                        class="px-2.5 py-1 rounded-lg border border-slate-200 text-slate-600 text-[11px] font-semibold hover:bg-slate-100 transition-colors"
+                      >
+                        - Desmarcar
+                      </button>
+                    </div>
+                  } @else {
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-slate-900">Resultados de búsqueda</span>
+                      <span class="text-[11px] text-slate-500 font-medium">
+                        ({{ displayedStories.length }} encontrados)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      (click)="storySearch.set('')"
+                      class="text-xs text-emerald-600 hover:text-emerald-700 font-bold"
+                    >
+                      Volver a categorías
+                    </button>
+                  }
+                </div>
+
+                <!-- Grid Scrollable de Cuentos -->
+                <div class="flex-1 overflow-y-auto p-3">
+                  @if (displayedStories.length === 0) {
+                    <div class="h-full flex flex-col items-center justify-center py-12 text-center text-slate-400">
+                      <svg class="w-8 h-8 text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <p class="text-xs font-bold text-slate-700">No se encontraron cuentos</p>
+                      <p class="text-[11px] text-slate-400 mt-0.5">Intenta con otro término de búsqueda.</p>
+                    </div>
+                  } @else {
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                      @for (item of displayedStories; track item.story.id) {
+                        <div
+                          (click)="toggleStory(item.story.id)"
+                          class="p-2.5 rounded-xl border cursor-pointer transition-all flex items-start gap-2.5 select-none"
+                          [ngClass]="isStorySelected(item.story.id) ? 'bg-emerald-50/80 border-emerald-400 ring-1 ring-emerald-400 shadow-xs' : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/60'"
+                        >
+                          <div 
+                            class="w-4.5 h-4.5 rounded-md border flex items-center justify-center shrink-0 mt-0.5 transition-colors"
+                            [ngClass]="isStorySelected(item.story.id) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 bg-white'"
+                          >
+                            @if (isStorySelected(item.story.id)) {
+                              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                              </svg>
+                            }
+                          </div>
+
+                          <div class="min-w-0 flex-1">
+                            <h6 class="text-xs font-bold text-slate-800 leading-tight line-clamp-2" [title]="item.story.title">
+                              {{ item.story.title }}
+                            </h6>
+                            <div class="flex items-center gap-1.5 mt-1">
+                              <span class="text-[10px] text-slate-400 font-semibold">Pág. {{ item.story.page }}</span>
+                              @if (storySearch()) {
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-medium truncate max-w-[100px]">
+                                  {{ item.categoryName }}
+                                </span>
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+            </div>
+          </div>
+        }
+
+        <!-- Fechas y Vigencia -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-2">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Vigencia (Días) *</label>
             <input
@@ -119,7 +378,7 @@
               [(ngModel)]="form.duration_days"
               name="duration_days"
               required
-              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-semibold"
             />
           </div>
 
@@ -146,6 +405,7 @@
           </div>
         </div>
 
+        <!-- Estado Activo -->
         <div class="flex items-center gap-3 pt-2">
           <label class="relative inline-flex items-center cursor-pointer">
             <input

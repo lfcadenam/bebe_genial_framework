@@ -93,4 +93,84 @@ describe('ConveniosComponent', () => {
     component.closeStudentsModal();
     expect(component.isStudentsModalOpen()).toBeFalse();
   });
+
+  it('should open and close QR modal and password modal', () => {
+    const mockPartner = {
+      id: 10,
+      company_name: 'Colegio ABC',
+      contact_name: 'Director Juan',
+      contact_email: 'juan@abc.edu',
+      is_agreement: true,
+      allowed_months: 12,
+      status: 'active' as const,
+      created_at: '2026-01-01',
+    };
+
+    component.openQrModal(mockPartner);
+    expect(component.selectedPartner()).toEqual(mockPartner);
+    expect(component.isQrModalOpen()).toBeTrue();
+    component.closeQrModal();
+    expect(component.isQrModalOpen()).toBeFalse();
+
+    component.openPasswordModal(mockPartner);
+    expect(component.isPasswordModalOpen()).toBeTrue();
+    component.closePasswordModal();
+    expect(component.isPasswordModalOpen()).toBeFalse();
+  });
+
+  it('should open confirm dialog for toggle status and execute on confirmation', () => {
+    const mockPartner = {
+      id: 10,
+      company_name: 'Colegio ABC',
+      contact_name: 'Director Juan',
+      contact_email: 'juan@abc.edu',
+      is_agreement: true,
+      allowed_months: 12,
+      status: 'active' as const,
+      created_at: '2026-01-01',
+    };
+    spyOn(commercialService, 'togglePartnerStatus').and.returnValue(of({
+      success: true,
+      message: 'Aliado inactivado exitosamente.',
+      data: { ...mockPartner, status: 'inactive' as const },
+    }));
+    spyOn(component, 'loadPartners');
+
+    component.onToggleStatus(mockPartner);
+    expect(component.confirmDialog().isOpen).toBeTrue();
+    expect(component.confirmDialog().title).toBe('Inactivar Aliado Comercial');
+
+    component.onConfirmDialogAction();
+    expect(commercialService.togglePartnerStatus).toHaveBeenCalledWith(10);
+    expect(component.loadPartners).toHaveBeenCalled();
+    expect(component.confirmDialog().isOpen).toBeFalse();
+  });
+
+  it('should open confirm dialog for delete partner and execute on confirmation', () => {
+    const mockPartner = {
+      id: 10,
+      company_name: 'Colegio ABC',
+      contact_name: 'Director Juan',
+      contact_email: 'juan@abc.edu',
+      is_agreement: true,
+      allowed_months: 12,
+      status: 'active' as const,
+      created_at: '2026-01-01',
+    };
+    spyOn(commercialService, 'deletePartner').and.returnValue(of({
+      success: true,
+      message: 'Aliado eliminado correctamente.',
+    }));
+    spyOn(component, 'loadPartners');
+
+    component.onDeletePartner(mockPartner);
+    expect(component.confirmDialog().isOpen).toBeTrue();
+    expect(component.confirmDialog().type).toBe('danger');
+    expect(component.confirmDialog().title).toBe('Eliminar Aliado Comercial');
+
+    component.onConfirmDialogAction();
+    expect(commercialService.deletePartner).toHaveBeenCalledWith(10);
+    expect(component.loadPartners).toHaveBeenCalled();
+    expect(component.confirmDialog().isOpen).toBeFalse();
+  });
 });

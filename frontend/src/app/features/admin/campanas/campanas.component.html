@@ -1,15 +1,23 @@
 <div class="space-y-6">
 
-  <!-- ==================== TOAST FLASH ==================== -->
+  <!-- ==================== TOAST FLASH FLOTANTE NUVEX ==================== -->
   @if (flashMessage()) {
-    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center justify-between shadow-xs animate-in fade-in slide-in-from-top-2">
-      <div class="flex items-center gap-2.5">
-        <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-        </svg>
-        <span>{{ flashMessage() }}</span>
+    <div
+      class="fixed bottom-6 right-6 z-50 max-w-md p-4 rounded-2xl bg-white border border-emerald-200/80 shadow-xl shadow-emerald-500/10 flex items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-5 duration-200"
+    >
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+        <span class="text-xs font-semibold text-slate-800">{{ flashMessage() }}</span>
       </div>
-      <button (click)="flashMessage.set(null)" class="text-emerald-500 hover:text-emerald-700">
+      <button
+        type="button"
+        (click)="flashMessage.set(null)"
+        class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition-colors"
+      >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -380,7 +388,14 @@
                     <small class="text-slate-400 text-[10px]">{{ c.duration_days }} días de acceso</small>
                   </td>
                   <td class="py-4 px-6 text-center font-bold text-slate-800">
-                    {{ c.enrollments_count || 0 }}
+                    <button
+                      type="button"
+                      (click)="openCampaignStudents(c)"
+                      title="Ver alumnos matriculados en esta campaña"
+                      class="px-2.5 py-1 rounded-xl bg-slate-50 hover:bg-emerald-50 hover:text-emerald-700 border border-slate-200/80 transition-all font-bold text-xs"
+                    >
+                      {{ c.enrollments_count || 0 }} alumnos
+                    </button>
                   </td>
                   <td class="py-4 px-6 text-center">
                     <button
@@ -394,6 +409,16 @@
                   </td>
                   <td class="py-4 px-6 text-right">
                     <div class="flex items-center justify-end gap-1.5">
+                      <button
+                        type="button"
+                        (click)="openCampaignStudents(c)"
+                        title="Ver Alumnos Matriculados"
+                        class="p-1.5 rounded-lg text-emerald-600 hover:text-emerald-800 hover:bg-emerald-50 transition-colors"
+                      >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                      </button>
                       <button
                         type="button"
                         (click)="openEditCampaign(c)"
@@ -700,8 +725,25 @@
   (campaignSaved)="onCampaignSaved()"
 />
 
+<app-campaign-students-modal
+  [isOpen]="isCampaignStudentsModalOpen()"
+  [campaign]="campaignForStudents()"
+  (close)="closeCampaignStudentsModal()"
+/>
+
 <app-audit-detail-modal
   [isOpen]="isAuditDetailModalOpen()"
   [log]="selectedAuditLog()"
   (close)="closeAuditDetail()"
+/>
+
+<!-- Modal de Confirmación Nuvex Modern Curve UI -->
+<app-confirm-modal
+  [isOpen]="confirmDialog().isOpen"
+  [title]="confirmDialog().title"
+  [message]="confirmDialog().message"
+  [confirmText]="confirmDialog().confirmText"
+  [type]="confirmDialog().type"
+  (confirm)="confirmDialog().action()"
+  (cancel)="confirmDialog.set({ ...confirmDialog(), isOpen: false })"
 />

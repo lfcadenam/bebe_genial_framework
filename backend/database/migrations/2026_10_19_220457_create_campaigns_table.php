@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('code', 80)->unique()->index();
             $table->string('name', 150);
             $table->unsignedInteger('book_limit')->default(12); // 0 = Libros ilimitados
+            $table->json('cuentos_permitidos')->nullable();
             $table->unsignedInteger('duration_days')->default(30);
             $table->date('starts_at');
             $table->date('ends_at');

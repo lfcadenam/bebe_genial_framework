@@ -16,11 +16,41 @@ export class CursosComponent implements OnInit {
   public searchTerm = signal<string>('');
   public statusFilter = signal<string>('');
   public currentPage = signal<number>(1);
+  public pageSize = signal<number>(8); // 8 cursos = exactamente 2 filas de 4 columnas
+  public viewMode = signal<'grid' | 'table'>('grid');
 
   public isDrawerOpen = signal<boolean>(false);
   public selectedCourse = signal<CourseCatalogItem | null>(null);
 
   public flashMessage = signal<string | null>(null);
+
+  /**
+   * Resuelve la URL de imagen oficial o legacy para cada curso
+   */
+  public getCourseImage(c: CourseCatalogItem): string {
+    if (c.cover_image) {
+      if (c.cover_image.startsWith('http') || c.cover_image.startsWith('/')) {
+        return c.cover_image;
+      }
+      return `/images/cursos/${c.cover_image}`;
+    }
+    // Mapeo legacy por ID conocido si no tiene cover_image
+    if (c.id === 1) return '/images/cursos/curso_metodo_bebe_poliglota.jpg';
+    if (c.id === 3) return '/images/cursos/CuRSoOj59wmHKPvmUqltpW8LZ.png';
+    if (c.id === 5) return '/images/cursos/CuRSo6CZoZHCqgVcVWtJrr2mD.png';
+    if (c.id === 6) return '/images/cursos/CuRSozlRJPWqvuKgWv78cIhS3.png';
+    if (c.id === 22) return '/images/cursos/CuRSoJe0rNerVCFd6jmZH0GRk.png';
+    if (c.id === 23) return '/images/cursos/CuRSo6XO4tDfWsxxNa0SwUPjJ.png';
+    if (c.id === 24) return '/images/cursos/CuRSoQTE3VyfCRRnqo64oXL6A.png';
+    return '/images/cursos/bebe-genial.png';
+  }
+
+  public onImgError(event: Event): void {
+    const target = event.target as HTMLImageElement;
+    if (target) {
+      target.src = '/images/cursos/bebe-genial.png';
+    }
+  }
 
   ngOnInit(): void {
     this.loadCourses();
@@ -32,7 +62,7 @@ export class CursosComponent implements OnInit {
         search: this.searchTerm(),
         status: this.statusFilter() || undefined,
         page: this.currentPage(),
-        per_page: 15,
+        per_page: this.pageSize(),
       })
       .subscribe();
   }
@@ -49,11 +79,34 @@ export class CursosComponent implements OnInit {
     this.loadCourses();
   }
 
+  public onPageSizeChange(size: number): void {
+    this.pageSize.set(Number(size));
+    this.currentPage.set(1);
+    this.loadCourses();
+  }
+
   public onPageChange(page: number): void {
-    if (page >= 1 && page <= this.academicService.coursesMeta().last_page) {
+    const lastPage = this.academicService.coursesMeta()?.last_page || 1;
+    if (page >= 1 && page <= lastPage) {
       this.currentPage.set(page);
       this.loadCourses();
+      // Desplazamiento suave al tope del catálogo
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }
+
+  public getPagesArray(): number[] {
+    const totalPages = this.academicService.coursesMeta()?.last_page || 1;
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  public getPaginationRange(): { start: number; end: number; total: number } {
+    const meta = this.academicService.coursesMeta();
+    const total = meta?.total || 0;
+    if (total === 0) return { start: 0, end: 0, total: 0 };
+    const start = (this.currentPage() - 1) * this.pageSize() + 1;
+    const end = Math.min(this.currentPage() * this.pageSize(), total);
+    return { start, end, total };
   }
 
   public openNewCourse(): void {

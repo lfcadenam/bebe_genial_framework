@@ -155,6 +155,54 @@ class AdminCommercialModuleApiTest extends TestCase
             ->assertJsonCount(2, 'data');
     }
 
+    public function test_admin_can_use_legacy_distributor_actions(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Sanctum::actingAs($admin);
+
+        $partner = CommercialPartner::create([
+            'company_name' => 'Distribuidor Andino',
+            'contact_name' => 'Carlos Gomez',
+            'contact_email' => 'carlos@andino.com',
+            'is_agreement' => false,
+            'status' => 'active',
+            'allowed_months' => 6,
+        ]);
+
+        // 1. Toggle status
+        $toggleRes = $this->postJson(route('api.v1.admin.commercial-partners.toggle', ['id' => $partner->id]));
+        $toggleRes->assertStatus(200)
+            ->assertJson([
+                'success' => true,
+                'data' => ['status' => 'inactive'],
+            ]);
+
+        // 2. Reset password
+        $resetRes = $this->postJson(route('api.v1.admin.commercial-partners.reset-password', ['id' => $partner->id]), [
+            'password' => 'NuevaClave123*',
+        ]);
+        $resetRes->assertStatus(200)
+            ->assertJson(['success' => true]);
+
+        // 3. QR Code & referral link
+        $qrRes = $this->getJson(route('api.v1.admin.commercial-partners.qr-code', ['id' => $partner->id]));
+        $qrRes->assertStatus(200)
+            ->assertJsonStructure([
+                'success',
+                'data' => ['partner_id', 'company_name', 'qr_code', 'register_url'],
+            ]);
+
+        // 4. Export students
+        $exportSingleRes = $this->get(route('api.v1.admin.commercial-partners.export-students', ['id' => $partner->id]));
+        $exportSingleRes->assertStatus(200)
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+
+        // 5. Export all students
+        $exportAllRes = $this->get(route('api.v1.admin.commercial-partners.export-all'));
+        $exportAllRes->assertStatus(200)
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
+    }
+
     public function test_admin_can_manage_wompi_plans(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

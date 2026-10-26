@@ -109,4 +109,43 @@ describe('CampanasComponent', () => {
     component.closeAuditDetail();
     expect(component.isAuditDetailModalOpen()).toBeFalse();
   });
+
+  it('should trigger confirmDialog on regenerate key and delete partner', () => {
+    const mockPartner = {
+      id: 1,
+      origin_code: 1,
+      name: 'Colsubsidio',
+      partner_code: 'colsubsidio',
+      api_key: 'bbg_live_test123',
+      status: 'active' as const,
+      created_at: '2026-01-01',
+    };
+
+    component.onRegenerateKey(mockPartner);
+    expect(component.confirmDialog().isOpen).toBeTrue();
+    expect(component.confirmDialog().type).toBe('warning');
+
+    component.onDeletePartner(mockPartner);
+    expect(component.confirmDialog().isOpen).toBeTrue();
+    expect(component.confirmDialog().type).toBe('danger');
+  });
+
+  it('should trigger confirmDialog on delete campaign', () => {
+    const mockCampaign = {
+      id: 10,
+      course_id: 24,
+      code: 'COLSUB_2026',
+      name: 'Campaña Escolar Colsubsidio',
+      book_limit: 5,
+      duration_days: 60,
+      starts_at: '2026-01-01',
+      ends_at: '2026-12-31',
+      is_active: true,
+      created_at: '2026-01-01',
+    };
+
+    component.onDeleteCampaign(mockCampaign);
+    expect(component.confirmDialog().isOpen).toBeTrue();
+    expect(component.confirmDialog().confirmText).toBe('Eliminar Campaña');
+  });
 });

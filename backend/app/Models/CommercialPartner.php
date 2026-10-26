@@ -18,6 +18,8 @@ class CommercialPartner extends Model
         'contact_phone',
         'is_agreement',
         'status',
+        'qr_code',
+        'user_id',
         'allowed_courses',
         'allowed_months',
         'notes',
@@ -33,6 +35,14 @@ class CommercialPartner extends Model
     }
 
     /**
+     * Cuenta de usuario asociada (si aplica)
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
      * Alumnos / usuarios matriculados por este distribuidor o convenio
      */
     public function students(): HasMany
@@ -40,3 +50,4 @@ class CommercialPartner extends Model
         return $this->hasMany(User::class, 'created_by');
     }
 }
+

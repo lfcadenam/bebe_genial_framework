@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Course;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdminCourseCatalogController extends Controller
 {
@@ -270,6 +271,86 @@ class AdminCourseCatalogController extends Controller
         return response()->json([
             'success' => true,
             'message' => "Curso '{$course->title}' eliminado correctamente.",
+        ]);
+    }
+
+    /**
+     * Subir imagen para curso pedagógico
+     */
+    public function uploadImage(Request $request): JsonResponse
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'code' => 'UNAUTHORIZED_ACCESS',
+                'message' => 'No tienes permisos de administrador.',
+            ], 403);
+        }
+
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp,svg,gif|max:5120',
+        ]);
+
+        $file = $request->file('image');
+        $extension = $file->getClientOriginalExtension();
+        $filename = 'CuRSo' . Str::random(20) . '.' . $extension;
+
+        // Directorio destino backend
+        $backendDir = public_path('images/cursos');
+        if (!file_exists($backendDir)) {
+            mkdir($backendDir, 0755, true);
+        }
+        $file->move($backendDir, $filename);
+
+        // Replicar en frontend/public para desarrollo y build
+        $frontendDir = base_path('../frontend/public/images/cursos');
+        if (file_exists($frontendDir)) {
+            copy($backendDir . '/' . $filename, $frontendDir . '/' . $filename);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Imagen cargada correctamente.',
+            'filename' => $filename,
+            'url' => '/images/cursos/' . $filename,
+        ]);
+    }
+
+    /**
+     * Lista de imágenes disponibles del catálogo legacy y subidas
+     */
+    public function availableImages(Request $request): JsonResponse
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'code' => 'UNAUTHORIZED_ACCESS',
+                'message' => 'No tienes permisos de administrador.',
+            ], 403);
+        }
+
+        $dir = public_path('images/cursos');
+        $images = [];
+
+        if (file_exists($dir)) {
+            $files = scandir($dir);
+            foreach ($files as $file) {
+                if ($file === '.' || $file === '..' || is_dir($dir . '/' . $file)) {
+                    continue;
+                }
+                $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                if (in_array($ext, ['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'])) {
+                    $images[] = [
+                        'filename' => $file,
+                        'url' => '/images/cursos/' . $file,
+                    ];
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $images,
         ]);
     }
 }

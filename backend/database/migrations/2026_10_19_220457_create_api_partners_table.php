@@ -20,6 +20,8 @@ return new class extends Migration
             $table->text('ip_whitelist')->nullable();
             $table->string('contact_name', 120)->nullable();
             $table->string('contact_email', 150)->nullable();
+            $table->text('ghl_access_token')->nullable();
+            $table->string('etiqueta', 100)->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active')->index();
             $table->timestamps();
             $table->softDeletes();

@@ -327,4 +327,141 @@ class AdminApiCampanasModuleApiTest extends TestCase
             ->assertJsonPath('success', true)
             ->assertJsonCount(1, 'data');
     }
+
+    public function test_admin_can_fetch_cuentos_catalog(): void
+    {
+        $token = $this->admin->createToken('test')->plainTextToken;
+
+        $response = $this->withHeader('Authorization', "Bearer {$token}")
+            ->getJson('/api/v1/admin/campaigns/cuentos-catalog')
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('total_stories', 365);
+
+        $this->assertCount(12, $response->json('data'));
+    }
+
+    public function test_admin_can_create_and_update_campaign_with_selected_cuentos(): void
+    {
+        $token = $this->admin->createToken('test')->plainTextToken;
+
+        // Ensure course 24 exists
+        $course24 = Course::find(24);
+        if (!$course24) {
+            $course24 = Course::forceCreate([
+                'id' => 24,
+                'title' => 'Cuentos Leo con LEO',
+                'description' => '365 cuentos interactivos',
+                'is_active' => true,
+            ]);
+        }
+
+        // 1. Error if course 24 and empty cuentos array
+        $this->withHeader('Authorization', "Bearer {$token}")
+            ->postJson('/api/v1/admin/campaigns', [
+                'course_id' => 24,
+                'code' => 'CAMP_EMPTY',
+                'name' => 'Campaña Vacía',
+                'duration_days' => 30,
+                'starts_at' => now()->toDateString(),
+                'ends_at' => now()->addMonth()->toDateString(),
+                'cuentos_seleccionados' => [],
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('success', false);
+
+        // 2. Select subset: 3 cuentos (1, 2, 3)
+        $subsetRes = $this->withHeader('Authorization', "Bearer {$token}")
+            ->postJson('/api/v1/admin/campaigns', [
+                'course_id' => 24,
+                'code' => 'CAMP_SUBSET',
+                'name' => 'Campaña Trilogía',
+                'duration_days' => 30,
+                'starts_at' => now()->toDateString(),
+                'ends_at' => now()->addMonth()->toDateString(),
+                'cuentos_seleccionados' => [3, 1, 2],
+            ])
+            ->assertStatus(201)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.book_limit', 3)
+            ->assertJsonPath('data.cuentos_permitidos', [1, 2, 3]);
+
+        $campId = $subsetRes->json('data.id');
+
+        // 3. Update to all 365 (or >= 365)
+        $allIds = range(1, 365);
+        $this->withHeader('Authorization', "Bearer {$token}")
+            ->putJson("/api/v1/admin/campaigns/{$campId}", [
+                'course_id' => 24,
+                'code' => 'CAMP_SUBSET',
+                'name' => 'Campaña Completa',
+                'duration_days' => 45,
+                'starts_at' => now()->toDateString(),
+                'ends_at' => now()->addMonths(2)->toDateString(),
+                'cuentos_seleccionados' => $allIds,
+            ])
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.book_limit', 365)
+            ->assertJsonPath('data.cuentos_permitidos', null);
+    }
+
+    public function test_admin_can_view_and_export_campaign_students(): void
+    {
+        $token = $this->admin->createToken('test')->plainTextToken;
+
+        $campaign = Campaign::create([
+            'course_id' => $this->course->id,
+            'code' => 'CAMP_STUDENTS',
+            'name' => 'Campaña Con Alumnos',
+            'book_limit' => 10,
+            'duration_days' => 30,
+            'starts_at' => now()->toDateString(),
+            'ends_at' => now()->addMonth()->toDateString(),
+            'is_active' => true,
+        ]);
+
+        $user = User::factory()->create([
+            'first_name' => 'Camila',
+            'last_name' => 'Morales',
+            'email' => 'camila@familia.com',
+            'phone' => '3001234567',
+            'role' => 'parent',
+        ]);
+
+        \App\Models\BabyProfile::create([
+            'user_id' => $user->id,
+            'full_name' => 'Mateo Morales',
+            'birth_date' => now()->subYears(2)->toDateString(),
+        ]);
+
+        Enrollment::create([
+            'user_id' => $user->id,
+            'course_id' => $this->course->id,
+            'campaign_id' => $campaign->id,
+            'access_type' => 'FREEMIUM',
+            'book_limit' => 10,
+            'origin_channel' => 'API Leo con LEO',
+            'enrolled_at' => now()->toDateString(),
+            'expires_at' => now()->addDays(30)->toDateString(),
+        ]);
+
+        // 1. List students JSON
+        $this->withHeader('Authorization', "Bearer {$token}")
+            ->getJson("/api/v1/admin/campaigns/{$campaign->id}/students")
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.parent_name', 'Camila Morales')
+            ->assertJsonPath('data.0.baby_name', 'Mateo Morales')
+            ->assertJsonPath('data.0.is_valid', true);
+
+        // 2. Export CSV
+        $exportRes = $this->withHeader('Authorization', "Bearer {$token}")
+            ->get("/api/v1/admin/campaigns/{$campaign->id}/export-students")
+            ->assertStatus(200);
+
+        $this->assertTrue(str_contains($exportRes->headers->get('Content-Disposition') ?? '', 'alumnos_campana_CAMP_STUDENTS'));
+    }
 }
+

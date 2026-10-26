@@ -1,11 +1,14 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AdminApiCampanasService, ApiAuditLog, ApiPartner, Campaign } from '../../../core/services/admin-api-campanas.service';
 import { AdminUsersService } from '../../../core/services/admin-users.service';
 import { PartnerModalComponent } from './components/partner-modal/partner-modal.component';
 import { CampaignModalComponent } from './components/campaign-modal/campaign-modal.component';
+import { CampaignStudentsModalComponent } from './components/campaign-students-modal/campaign-students-modal.component';
 import { AuditDetailModalComponent } from './components/audit-detail-modal/audit-detail-modal.component';
+import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-campanas',
@@ -15,13 +18,17 @@ import { AuditDetailModalComponent } from './components/audit-detail-modal/audit
     FormsModule,
     PartnerModalComponent,
     CampaignModalComponent,
+    CampaignStudentsModalComponent,
     AuditDetailModalComponent,
+    ConfirmModalComponent,
   ],
   templateUrl: './campanas.component.html',
 })
 export class CampanasComponent implements OnInit {
   public campanasService = inject(AdminApiCampanasService);
   public usersService = inject(AdminUsersService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   // Pestaña Activa: 'aliados' | 'campanas' | 'auditoria'
   public activeTab = signal<'aliados' | 'campanas' | 'auditoria'>('aliados');
@@ -52,20 +59,59 @@ export class CampanasComponent implements OnInit {
   public isCampaignModalOpen = signal<boolean>(false);
   public selectedCampaign = signal<Campaign | null>(null);
 
+  public isCampaignStudentsModalOpen = signal<boolean>(false);
+  public campaignForStudents = signal<Campaign | null>(null);
+
   public isAuditDetailModalOpen = signal<boolean>(false);
   public selectedAuditLog = signal<ApiAuditLog | null>(null);
+
+  // Diálogo de Confirmación Nuvex Modern Curve UI
+  public confirmDialog = signal<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText: string;
+    type: 'danger' | 'warning' | 'info';
+    action: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    confirmText: 'Confirmar',
+    type: 'danger',
+    action: () => {},
+  });
 
   // Toast Notificaciones
   public flashMessage = signal<string | null>(null);
 
   ngOnInit(): void {
-    this.loadPartners();
+    this.route.queryParams.subscribe((params) => {
+      const tab = params['tab'];
+      if (tab === 'aliados' || tab === 'campanas' || tab === 'auditoria') {
+        this.setTab(tab, false);
+      } else {
+        this.loadPartners();
+      }
+    });
+
     this.usersService.getCourses().subscribe();
   }
 
-  public setTab(tab: 'aliados' | 'campanas' | 'auditoria'): void {
+  public setTab(tab: 'aliados' | 'campanas' | 'auditoria', updateUrl = true): void {
     this.activeTab.set(tab);
-    if (tab === 'campanas' && !this.campanasService.campaigns().length) {
+
+    if (updateUrl) {
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { tab },
+        queryParamsHandling: 'merge',
+      });
+    }
+
+    if (tab === 'aliados') {
+      this.loadPartners();
+    } else if (tab === 'campanas') {
       this.loadCampaigns();
     } else if (tab === 'auditoria') {
       this.loadAuditMetrics();
@@ -134,31 +180,43 @@ export class CampanasComponent implements OnInit {
   }
 
   public onRegenerateKey(partner: ApiPartner): void {
-    if (!confirm(`¿Estás seguro de regenerar la API Key de "${partner.name}"? La clave anterior dejará de funcionar inmediatamente.`)) {
-      return;
-    }
-
-    this.campanasService.regeneratePartnerKey(partner.id).subscribe({
-      next: (res) => {
-        this.loadPartners();
-        this.showFlash(`Nueva API Key generada para "${partner.name}".`);
+    this.confirmDialog.set({
+      isOpen: true,
+      title: '¿Regenerar API Key?',
+      message: `La clave actual para "${partner.name}" quedará revocada inmediatamente y el aliado deberá actualizar sus credenciales.`,
+      confirmText: 'Regenerar Clave',
+      type: 'warning',
+      action: () => {
+        this.confirmDialog.set({ ...this.confirmDialog(), isOpen: false });
+        this.campanasService.regeneratePartnerKey(partner.id).subscribe({
+          next: () => {
+            this.loadPartners();
+            this.showFlash(`Nueva API Key generada para "${partner.name}".`);
+          },
+          error: () => this.showFlash('Error al regenerar la API Key.'),
+        });
       },
-      error: () => this.showFlash('Error al regenerar la API Key.'),
     });
   }
 
   public onDeletePartner(partner: ApiPartner): void {
-    if (!confirm(`¿Estás seguro de eliminar el aliado "${partner.name}"?`)) {
-      return;
-    }
-
-    this.campanasService.deletePartner(partner.id).subscribe({
-      next: () => {
-        this.loadPartners();
-        this.showFlash(`Aliado "${partner.name}" eliminado correctamente.`);
-      },
-      error: (err: any) => {
-        this.showFlash(err.error?.message || 'Error al eliminar el aliado.');
+    this.confirmDialog.set({
+      isOpen: true,
+      title: '¿Eliminar Aliado Comercial?',
+      message: `¿Estás seguro de eliminar el aliado "${partner.name}"? Esta acción deshabilitará su integración externa.`,
+      confirmText: 'Eliminar Aliado',
+      type: 'danger',
+      action: () => {
+        this.confirmDialog.set({ ...this.confirmDialog(), isOpen: false });
+        this.campanasService.deletePartner(partner.id).subscribe({
+          next: () => {
+            this.loadPartners();
+            this.showFlash(`Aliado "${partner.name}" eliminado correctamente.`);
+          },
+          error: (err: any) => {
+            this.showFlash(err.error?.message || 'Error al eliminar el aliado.');
+          },
+        });
       },
     });
   }
@@ -238,19 +296,34 @@ export class CampanasComponent implements OnInit {
   }
 
   public onDeleteCampaign(campaign: Campaign): void {
-    if (!confirm(`¿Estás seguro de eliminar la campaña "${campaign.code}"?`)) {
-      return;
-    }
-
-    this.campanasService.deleteCampaign(campaign.id).subscribe({
-      next: () => {
-        this.loadCampaigns();
-        this.showFlash(`Campaña "${campaign.code}" eliminada.`);
-      },
-      error: (err: any) => {
-        this.showFlash(err.error?.message || 'Error al eliminar la campaña.');
+    this.confirmDialog.set({
+      isOpen: true,
+      title: '¿Eliminar Campaña B2B?',
+      message: `¿Estás seguro de eliminar la campaña "${campaign.code}"? Las matrículas ya activadas conservarán sus accesos.`,
+      confirmText: 'Eliminar Campaña',
+      type: 'danger',
+      action: () => {
+        this.confirmDialog.set({ ...this.confirmDialog(), isOpen: false });
+        this.campanasService.deleteCampaign(campaign.id).subscribe({
+          next: () => {
+            this.loadCampaigns();
+            this.showFlash(`Campaña "${campaign.code}" eliminada.`);
+          },
+          error: (err: any) => {
+            this.showFlash(err.error?.message || 'Error al eliminar la campaña.');
+          },
+        });
       },
     });
+  }
+
+  public openCampaignStudents(campaign: Campaign): void {
+    this.campaignForStudents.set(campaign);
+    this.isCampaignStudentsModalOpen.set(true);
+  }
+
+  public closeCampaignStudentsModal(): void {
+    this.isCampaignStudentsModalOpen.set(false);
   }
 
   // =================== AUDITORÍA ===================

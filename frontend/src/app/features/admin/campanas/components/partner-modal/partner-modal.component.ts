@@ -1,16 +1,16 @@
 import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
-
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminApiCampanasService, ApiPartner, CreatePartnerPayload } from '../../../../../core/services/admin-api-campanas.service';
 
 @Component({
   selector: 'app-partner-modal',
   standalone: true,
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './partner-modal.component.html',
 })
 export class PartnerModalComponent {
-  private campanasService = inject(AdminApiCampanasService);
+  public campanasService = inject(AdminApiCampanasService);
 
   @Input() isOpen = false;
   @Input() set partner(val: ApiPartner | null) {
@@ -31,6 +31,7 @@ export class PartnerModalComponent {
   private _partner: ApiPartner | null = null;
   public isSaving = signal<boolean>(false);
   public errorMessage = signal<string | null>(null);
+  public showAdvanced = signal<boolean>(false);
 
   public form: CreatePartnerPayload = {
     name: '',
@@ -38,8 +39,14 @@ export class PartnerModalComponent {
     contact_name: '',
     contact_email: '',
     ip_whitelist: '',
+    ghl_access_token: '',
+    etiqueta: '',
     status: 'active',
   };
+
+  public get originCode(): number {
+    return this.partner?.origin_code || this.form.origin_code || (this.campanasService.partnersMeta().next_origin_code || 1);
+  }
 
   private initForm(partner: ApiPartner): void {
     this.form = {
@@ -48,7 +55,10 @@ export class PartnerModalComponent {
       contact_name: partner.contact_name || '',
       contact_email: partner.contact_email || '',
       ip_whitelist: partner.ip_whitelist || '',
+      ghl_access_token: partner.ghl_access_token || '',
+      etiqueta: partner.etiqueta || '',
       status: partner.status,
+      origin_code: partner.origin_code,
     };
     this.errorMessage.set(null);
   }
@@ -61,6 +71,8 @@ export class PartnerModalComponent {
       contact_name: '',
       contact_email: '',
       ip_whitelist: '',
+      ghl_access_token: '',
+      etiqueta: '',
       status: 'active',
       origin_code: nextCode,
     };
@@ -69,7 +81,7 @@ export class PartnerModalComponent {
 
   public onSubmit(): void {
     if (!this.form.name.trim() || !this.form.partner_code.trim()) {
-      this.errorMessage.set('El nombre y el slug de la plataforma son obligatorios.');
+      this.errorMessage.set('El nombre de la empresa y el código slug único son obligatorios.');
       return;
     }
 
@@ -88,7 +100,7 @@ export class PartnerModalComponent {
       },
       error: (err: any) => {
         this.isSaving.set(false);
-        this.errorMessage.set(err.error?.message || 'Error al guardar el aliado.');
+        this.errorMessage.set(err.error?.message || 'Error al guardar la plataforma B2B.');
       },
     });
   }

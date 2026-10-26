@@ -138,6 +138,21 @@
                 <option value="suspended">Suspendido</option>
               </select>
             </div>
+            @if (!partner && !form.is_agreement) {
+              <div class="sm:col-span-2 pt-2 border-t border-slate-200/60">
+                <label class="block text-xs font-medium text-slate-600 mb-1">
+                  Contraseña Inicial de Acceso al Portal
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  [(ngModel)]="form.password"
+                  placeholder="Mínimo 6 caracteres (permite al distribuidor iniciar sesión)"
+                  class="w-full px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium font-mono"
+                />
+                <span class="block text-[11px] text-slate-400 mt-1">Opcional: Si se deja en blanco, se creará el perfil comercial sin acceso web directo.</span>
+              </div>
+            }
           </div>
         </div>
         <!-- SECCIÓN 2: CURSOS PERMITIDOS PARA VENTA O ASIGNACIÓN -->
@@ -185,9 +200,20 @@
               min="1"
               max="120"
               required
-              class="w-28 px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              class="w-24 px-3.5 py-2 text-xs rounded-xl bg-white border border-slate-200 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               />
-            <span class="text-xs text-slate-600 font-medium">Meses de vigencia (ej: 1, 3, 6, 12, 24)</span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              @for (m of [1, 3, 6, 12, 24]; track m) {
+                <button
+                  type="button"
+                  (click)="setMonths(m)"
+                  class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                  [ngClass]="form.allowed_months === m ? 'bg-emerald-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'"
+                >
+                  {{ m }}m
+                </button>
+              }
+            </div>
           </div>
         </div>
         <!-- SECCIÓN 4: NOTAS COMERCIALES -->

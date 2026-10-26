@@ -126,6 +126,21 @@ export class AdminAcademicService {
     return this.http.put<any>(`${this.apiUrl}/course-catalog/${id}`, payload);
   }
 
+  public uploadCourseImage(file: File): Observable<{ success: boolean; filename: string; url: string; message: string }> {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.http.post<{ success: boolean; filename: string; url: string; message: string }>(
+      `${this.apiUrl}/course-catalog/upload-image`,
+      formData
+    );
+  }
+
+  public getAvailableCourseImages(): Observable<{ success: boolean; data: { filename: string; url: string }[] }> {
+    return this.http.get<{ success: boolean; data: { filename: string; url: string }[] }>(
+      `${this.apiUrl}/course-catalog/available-images`
+    );
+  }
+
   public toggleCourseActive(id: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/course-catalog/${id}/toggle-active`, {});
   }

@@ -58,112 +58,178 @@
           <select
             name="course_id"
             [(ngModel)]="form.course_id"
+            (ngModelChange)="onCourseChange($event)"
             required
-            class="w-full px-4 py-2.5 text-xs sm:text-sm rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium"
+            class="w-full px-4 py-2.5 text-xs sm:text-sm rounded-2xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium cursor-pointer"
             >
-            @for (course of courses; track course) {
+            @for (course of courses; track course.id) {
               <option [value]="course.id">
                 {{ course.id }} — {{ course.title }} ({{ course.hours || 0 }} hrs)
               </option>
             }
           </select>
         </div>
-        <!-- Tipo de Acceso (FULL vs FREEMIUM) -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-            Modalidad de Acceso
-          </label>
-          <div class="grid grid-cols-2 gap-3">
-            <label
-              class="p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between"
-              [ngClass]="form.access_type === 'FULL' ? 'bg-emerald-50/60 border-emerald-500 ring-2 ring-emerald-500/10' : 'bg-slate-50 border-slate-200 hover:bg-slate-100/70'"
-              >
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-xs font-bold text-slate-900">Acceso Completo</span>
-                <input
-                  type="radio"
-                  name="access_type"
-                  value="FULL"
-                  [(ngModel)]="form.access_type"
-                  class="text-emerald-600 focus:ring-emerald-500"
-                  />
+
+        <!-- Tipo de Acceso / Cuota (SOLO para Leo con LEO o cursos con cuentos) -->
+        @if (isCourseWithBooks()) {
+          <div class="space-y-4 animate-in fade-in duration-200">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                Modalidad de Acceso (Cuentos Leo con LEO)
+              </label>
+              <div class="grid grid-cols-2 gap-3">
+                <label
+                  class="p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between"
+                  [ngClass]="form.access_type === 'FULL' ? 'bg-emerald-50/60 border-emerald-500 ring-2 ring-emerald-500/10' : 'bg-slate-50 border-slate-200 hover:bg-slate-100/70'"
+                  >
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-slate-900">Acceso Completo</span>
+                    <input
+                      type="radio"
+                      name="access_type"
+                      value="FULL"
+                      [(ngModel)]="form.access_type"
+                      class="text-emerald-600 focus:ring-emerald-500"
+                      />
+                  </div>
+                  <span class="text-[11px] text-slate-500">Ilimitado a todos los cuentos y recursos</span>
+                </label>
+                <label
+                  class="p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between"
+                  [ngClass]="form.access_type === 'FREEMIUM' ? 'bg-emerald-50/60 border-emerald-500 ring-2 ring-emerald-500/10' : 'bg-slate-50 border-slate-200 hover:bg-slate-100/70'"
+                  >
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-bold text-slate-900">Con Cuota / Límite</span>
+                    <input
+                      type="radio"
+                      name="access_type"
+                      value="FREEMIUM"
+                      [(ngModel)]="form.access_type"
+                      class="text-emerald-600 focus:ring-emerald-500"
+                      />
+                  </div>
+                  <span class="text-[11px] text-slate-500">Restringido a un número fijo de cuentos</span>
+                </label>
               </div>
-              <span class="text-[11px] text-slate-500">Ilimitado a todos los recursos del curso</span>
-            </label>
-            <label
-              class="p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between"
-              [ngClass]="form.access_type === 'FREEMIUM' ? 'bg-emerald-50/60 border-emerald-500 ring-2 ring-emerald-500/10' : 'bg-slate-50 border-slate-200 hover:bg-slate-100/70'"
-              >
-              <div class="flex items-center justify-between mb-1">
-                <span class="text-xs font-bold text-slate-900">Con Cuota / Límite</span>
-                <input
-                  type="radio"
-                  name="access_type"
-                  value="FREEMIUM"
-                  [(ngModel)]="form.access_type"
-                  class="text-emerald-600 focus:ring-emerald-500"
-                  />
-              </div>
-              <span class="text-[11px] text-slate-500">Restringido a un número fijo de cuentos</span>
-            </label>
-          </div>
-        </div>
-        <!-- Límite de Libros (solo si es FREEMIUM) -->
-        @if (form.access_type === 'FREEMIUM') {
-          <div class="bg-amber-50/60 rounded-2xl p-4 border border-amber-200/60 animate-in fade-in duration-200">
-            <label class="block text-xs font-bold text-amber-900 mb-1">
-              Límite de Libros (Cuentos Leo con LEO)
-            </label>
-            <div class="flex items-center gap-3">
-              <input
-                type="number"
-                name="book_limit"
-                [(ngModel)]="form.book_limit"
-                min="1"
-                max="100"
-                class="w-28 px-3.5 py-2 text-xs rounded-xl bg-white border border-amber-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20"
-                />
-              <span class="text-xs text-amber-800 font-medium">cuentos permitidos</span>
             </div>
+
+            <!-- Límite de Libros (solo si es FREEMIUM en curso con cuentos) -->
+            @if (form.access_type === 'FREEMIUM') {
+              <div class="bg-amber-50/60 rounded-2xl p-4 border border-amber-200/60 animate-in fade-in duration-200">
+                <label class="block text-xs font-bold text-amber-900 mb-1">
+                  Límite de Libros (Cuentos Leo con LEO)
+                </label>
+                <div class="flex items-center gap-3">
+                  <input
+                    type="number"
+                    name="book_limit"
+                    [(ngModel)]="form.book_limit"
+                    min="1"
+                    max="1000"
+                    class="w-28 px-3.5 py-2 text-xs rounded-xl bg-white border border-amber-300 text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 font-bold"
+                    />
+                  <span class="text-xs text-amber-800 font-medium">cuentos permitidos</span>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- Nota sutil para cursos estándar que NO tienen cuentos -->
+          <div class="p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200/80 flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="font-bold text-slate-800">Acceso Estándar Completo</span>
+            </div>
+            <span class="text-[11px] text-slate-500 font-medium">Este curso no aplica restricción de cuentos</span>
           </div>
         }
-        <!-- Duración / Vigencia -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
-            Vigencia del Acceso
-          </label>
-          <div class="grid grid-cols-4 gap-2">
+
+        <!-- Vigencia del Acceso (Campo numérico y fecha flexible) -->
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Vigencia del Acceso
+            </label>
+            @if (form.expires_at) {
+              <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100">
+                Vence: <strong>{{ form.expires_at }}</strong> (aprox. {{ getVigenciaAproxText(form.duration_days) }})
+              </span>
+            }
+          </div>
+
+          <!-- Campos duales sincronizados: Numérico de días + Selector de fecha exacta tipo Legacy -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 mb-1">
+                Días de Vigencia (Campo Numérico)
+              </label>
+              <div class="relative">
+                <input
+                  type="number"
+                  name="duration_days"
+                  [(ngModel)]="form.duration_days"
+                  (ngModelChange)="onDurationDaysChange($event)"
+                  required
+                  min="1"
+                  max="3650"
+                  placeholder="365"
+                  class="w-full pl-3.5 pr-12 py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                  />
+                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400 pointer-events-none">
+                  días
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] font-semibold text-slate-500 mb-1">
+                Fecha del Vencimiento (Calendario)
+              </label>
+              <input
+                type="date"
+                name="expires_at"
+                [(ngModel)]="form.expires_at"
+                (ngModelChange)="onExpiresAtChange($event)"
+                required
+                class="w-full px-3.5 py-2.5 text-xs sm:text-sm font-semibold rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
+                />
+            </div>
+          </div>
+
+          <!-- Atajos Rápidos (Presets) -->
+          <div class="flex items-center gap-1.5 flex-wrap pt-1">
+            <span class="text-[11px] font-semibold text-slate-400 mr-1">Atajos:</span>
             <button
               type="button"
-              (click)="form.duration_type = '30'"
-              class="py-2 px-1 text-center rounded-xl text-xs font-bold transition-all border cursor-pointer"
-              [ngClass]="form.duration_type === '30' ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
+              (click)="setDurationPreset(30)"
+              class="px-2.5 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer"
+              [ngClass]="form.duration_days === 30 ? 'bg-emerald-500 text-white border-emerald-500 shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
               >
               30 Días
             </button>
             <button
               type="button"
-              (click)="form.duration_type = '90'"
-              class="py-2 px-1 text-center rounded-xl text-xs font-bold transition-all border cursor-pointer"
-              [ngClass]="form.duration_type === '90' ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
+              (click)="setDurationPreset(90)"
+              class="px-2.5 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer"
+              [ngClass]="form.duration_days === 90 ? 'bg-emerald-500 text-white border-emerald-500 shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
               >
-              3 Meses
+              3 Meses (90d)
             </button>
             <button
               type="button"
-              (click)="form.duration_type = '180'"
-              class="py-2 px-1 text-center rounded-xl text-xs font-bold transition-all border cursor-pointer"
-              [ngClass]="form.duration_type === '180' ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
+              (click)="setDurationPreset(180)"
+              class="px-2.5 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer"
+              [ngClass]="form.duration_days === 180 ? 'bg-emerald-500 text-white border-emerald-500 shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
               >
-              6 Meses
+              6 Meses (180d)
             </button>
             <button
               type="button"
-              (click)="form.duration_type = '365'"
-              class="py-2 px-1 text-center rounded-xl text-xs font-bold transition-all border cursor-pointer"
-              [ngClass]="form.duration_type === '365' ? 'bg-emerald-500 text-white border-emerald-500 shadow-sm' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
+              (click)="setDurationPreset(365)"
+              class="px-2.5 py-1 text-[11px] font-bold rounded-lg border transition-all cursor-pointer"
+              [ngClass]="form.duration_days === 365 ? 'bg-emerald-500 text-white border-emerald-500 shadow-xs' : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
               >
-              1 Año
+              1 Año (365d)
             </button>
           </div>
         </div>

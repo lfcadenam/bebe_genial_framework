@@ -10,6 +10,8 @@ export interface CommercialPartner {
   contact_phone?: string | null;
   is_agreement: boolean; // true: Convenio Institucional, false: Distribuidor
   status: 'active' | 'inactive' | 'suspended';
+  qr_code?: string | null;
+  user_id?: number | null;
   allowed_courses?: number[] | null;
   allowed_months: number;
   notes?: string | null;
@@ -89,6 +91,7 @@ export interface CreatePartnerPayload {
   allowed_courses?: number[];
   allowed_months: number;
   notes?: string;
+  password?: string;
 }
 
 export interface CreatePlanPayload {
@@ -189,6 +192,38 @@ export class AdminCommercialService {
     if (filters.per_page) params = params.set('per_page', filters.per_page.toString());
 
     return this.http.get(`${this.apiUrl}/commercial-partners/${id}/students`, { params });
+  }
+
+  togglePartnerStatus(id: number): Observable<{ success: boolean; message: string; data: CommercialPartner }> {
+    return this.http.post<{ success: boolean; message: string; data: CommercialPartner }>(
+      `${this.apiUrl}/commercial-partners/${id}/toggle-status`,
+      {}
+    );
+  }
+
+  resetPartnerPassword(id: number, password: string): Observable<{ success: boolean; message: string }> {
+    return this.http.post<{ success: boolean; message: string }>(
+      `${this.apiUrl}/commercial-partners/${id}/reset-password`,
+      { password }
+    );
+  }
+
+  getPartnerQr(id: number): Observable<{ success: boolean; data: { partner_id: number; company_name: string; qr_code: string; register_url: string } }> {
+    return this.http.get<{ success: boolean; data: { partner_id: number; company_name: string; qr_code: string; register_url: string } }>(
+      `${this.apiUrl}/commercial-partners/${id}/qr-code`
+    );
+  }
+
+  exportPartnerStudents(id: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/commercial-partners/${id}/export-students`, {
+      responseType: 'blob',
+    });
+  }
+
+  exportAllStudents(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/commercial-partners/export-all-students`, {
+      responseType: 'blob',
+    });
   }
 
   // ==================== WOMPI (PLANES, TRANSACCIONES & MÉTRICAS) ====================

@@ -116,5 +116,14 @@ class DatabaseSeeder extends Seeder
                 'must_change_password' => false,
             ]
         );
+
+        // 5. Planes de Pago WOMPI
+        $this->call(MigrateLegacyWompiPlansSeeder::class);
+
+        // 6. Convenios y Distribuidores Comerciales
+        $this->call(MigrateLegacyCommercialPartnersSeeder::class);
+
+        // 7. API Leo con LEO, Campañas y Auditoría
+        $this->call(MigrateLegacyApiCampanasSeeder::class);
     }
 }

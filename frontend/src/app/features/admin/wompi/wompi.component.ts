@@ -112,6 +112,11 @@ export class WompiComponent implements OnInit {
     });
   }
 
+  public getCourseName(courseId: number): string {
+    const course = this.usersService.courses().find((c) => c.id === courseId);
+    return course ? course.title : `Curso #${courseId}`;
+  }
+
   private showFlash(msg: string): void {
     this.flashMessage.set(msg);
     setTimeout(() => this.flashMessage.set(null), 4000);

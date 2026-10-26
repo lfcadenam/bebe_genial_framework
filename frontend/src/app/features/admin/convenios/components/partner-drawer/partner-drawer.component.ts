@@ -45,6 +45,7 @@ export class PartnerDrawerComponent {
     allowed_courses: [],
     allowed_months: 12,
     notes: '',
+    password: '',
   };
 
   private initForm(p: CommercialPartner): void {
@@ -58,6 +59,7 @@ export class PartnerDrawerComponent {
       allowed_courses: p.allowed_courses ? [...p.allowed_courses] : [],
       allowed_months: p.allowed_months || 12,
       notes: p.notes || '',
+      password: '',
     };
     this.errorMessage.set(null);
   }
@@ -73,8 +75,13 @@ export class PartnerDrawerComponent {
       allowed_courses: [],
       allowed_months: 12,
       notes: '',
+      password: '',
     };
     this.errorMessage.set(null);
+  }
+
+  public setMonths(months: number): void {
+    this.form.allowed_months = months;
   }
 
   public toggleCourse(courseId: number): void {

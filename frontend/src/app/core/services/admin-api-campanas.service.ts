@@ -12,6 +12,8 @@ export interface ApiPartner {
   ip_whitelist?: string | null;
   contact_name?: string | null;
   contact_email?: string | null;
+  ghl_access_token?: string | null;
+  etiqueta?: string | null;
   status: 'active' | 'inactive';
   campaigns_count?: number;
   audit_logs_count?: number;
@@ -26,13 +28,73 @@ export interface Campaign {
   course?: AdminCourse | null;
   code: string;
   name: string;
-  book_limit: number; // 0 = ilimitado
+  book_limit: number; // 0 = ilimitado, 365 = todos
+  cuentos_permitidos?: number[] | null;
   duration_days: number;
   starts_at: string;
   ends_at: string;
   is_active: boolean;
   enrollments_count?: number;
   created_at: string;
+}
+
+export interface CuentoItem {
+  id: number;
+  category_id: number;
+  title: string;
+  page: number;
+  slug?: string;
+}
+
+export interface CuentoCategory {
+  id: number;
+  name: string;
+  image: string;
+  image_url: string;
+  total_cuentos: number;
+  cuentos: CuentoItem[];
+}
+
+export interface CuentosCatalogResponse {
+  success: boolean;
+  total_stories: number;
+  data: CuentoCategory[];
+}
+
+export interface CampaignStudent {
+  id: number;
+  user_id?: number | null;
+  parent_name: string;
+  email?: string | null;
+  phone?: string | null;
+  user_status: string;
+  baby_name: string;
+  baby_birth_date?: string | null;
+  baby_age_text: string;
+  access_type: string;
+  book_limit: number;
+  origin_channel: string;
+  enrolled_at?: string | null;
+  expires_at?: string | null;
+  is_valid: boolean;
+}
+
+export interface CampaignStudentsResponse {
+  success: boolean;
+  campaign: {
+    id: number;
+    code: string;
+    name: string;
+    course_name: string;
+    partner_name: string;
+  };
+  data: CampaignStudent[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
 }
 
 export interface ApiAuditLog {
@@ -65,6 +127,8 @@ export interface CreatePartnerPayload {
   contact_name?: string | null;
   contact_email?: string | null;
   ip_whitelist?: string | null;
+  ghl_access_token?: string | null;
+  etiqueta?: string | null;
   status?: 'active' | 'inactive';
   origin_code?: number;
 }
@@ -79,6 +143,8 @@ export interface CreateCampaignPayload {
   starts_at: string;
   ends_at: string;
   is_active?: boolean;
+  cuentos_permitidos?: number[] | null;
+  cuentos_seleccionados?: number[];
 }
 
 @Injectable({
@@ -163,6 +229,25 @@ export class AdminApiCampanasService {
         error: () => this.isLoading.set(false),
       })
     );
+  }
+
+  public getCuentosCatalog(): Observable<CuentosCatalogResponse> {
+    return this.http.get<CuentosCatalogResponse>(`${this.apiUrl}/campaigns/cuentos-catalog`);
+  }
+
+  public getCampaignStudents(campaignId: number, filters: { page?: number; per_page?: number; search?: string } = {}): Observable<CampaignStudentsResponse> {
+    let params = new HttpParams();
+    if (filters.page) params = params.set('page', filters.page);
+    if (filters.per_page) params = params.set('per_page', filters.per_page);
+    if (filters.search) params = params.set('search', filters.search);
+
+    return this.http.get<CampaignStudentsResponse>(`${this.apiUrl}/campaigns/${campaignId}/students`, { params });
+  }
+
+  public exportCampaignStudents(campaignId: number): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/campaigns/${campaignId}/export-students`, {
+      responseType: 'blob',
+    });
   }
 
   public createCampaign(payload: CreateCampaignPayload): Observable<any> {

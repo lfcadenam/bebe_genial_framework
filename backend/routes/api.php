@@ -60,10 +60,15 @@ Route::prefix('v1')->group(function () {
             Route::prefix('commercial-partners')->group(function () {
                 Route::get('/', [AdminCommercialPartnerController::class, 'index'])->name('api.v1.admin.commercial-partners.index');
                 Route::post('/', [AdminCommercialPartnerController::class, 'store'])->name('api.v1.admin.commercial-partners.store');
+                Route::get('export-all-students', [AdminCommercialPartnerController::class, 'exportAllStudents'])->name('api.v1.admin.commercial-partners.export-all');
                 Route::get('{id}', [AdminCommercialPartnerController::class, 'show'])->name('api.v1.admin.commercial-partners.show');
                 Route::put('{id}', [AdminCommercialPartnerController::class, 'update'])->name('api.v1.admin.commercial-partners.update');
                 Route::delete('{id}', [AdminCommercialPartnerController::class, 'destroy'])->name('api.v1.admin.commercial-partners.destroy');
+                Route::post('{id}/toggle-status', [AdminCommercialPartnerController::class, 'toggleStatus'])->name('api.v1.admin.commercial-partners.toggle');
+                Route::post('{id}/reset-password', [AdminCommercialPartnerController::class, 'resetPassword'])->name('api.v1.admin.commercial-partners.reset-password');
+                Route::get('{id}/qr-code', [AdminCommercialPartnerController::class, 'qrCode'])->name('api.v1.admin.commercial-partners.qr-code');
                 Route::get('{id}/students', [AdminCommercialPartnerController::class, 'students'])->name('api.v1.admin.commercial-partners.students');
+                Route::get('{id}/export-students', [AdminCommercialPartnerController::class, 'exportStudents'])->name('api.v1.admin.commercial-partners.export-students');
             });
 
             // Módulo Comercial WOMPI
@@ -89,11 +94,14 @@ Route::prefix('v1')->group(function () {
 
             Route::prefix('campaigns')->group(function () {
                 Route::get('/', [AdminCampaignController::class, 'index'])->name('api.v1.admin.campaigns.index');
+                Route::get('cuentos-catalog', [AdminCampaignController::class, 'cuentosCatalog'])->name('api.v1.admin.campaigns.cuentos-catalog');
                 Route::post('/', [AdminCampaignController::class, 'store'])->name('api.v1.admin.campaigns.store');
                 Route::get('{id}', [AdminCampaignController::class, 'show'])->name('api.v1.admin.campaigns.show');
                 Route::put('{id}', [AdminCampaignController::class, 'update'])->name('api.v1.admin.campaigns.update');
                 Route::delete('{id}', [AdminCampaignController::class, 'destroy'])->name('api.v1.admin.campaigns.destroy');
                 Route::post('{id}/toggle-status', [AdminCampaignController::class, 'toggleStatus'])->name('api.v1.admin.campaigns.toggle');
+                Route::get('{id}/students', [AdminCampaignController::class, 'students'])->name('api.v1.admin.campaigns.students');
+                Route::get('{id}/export-students', [AdminCampaignController::class, 'exportStudents'])->name('api.v1.admin.campaigns.export-students');
             });
 
             Route::prefix('api-audit-logs')->group(function () {
@@ -106,6 +114,8 @@ Route::prefix('v1')->group(function () {
             Route::prefix('course-catalog')->group(function () {
                 Route::get('/', [AdminCourseCatalogController::class, 'index'])->name('api.v1.admin.course-catalog.index');
                 Route::post('/', [AdminCourseCatalogController::class, 'store'])->name('api.v1.admin.course-catalog.store');
+                Route::post('upload-image', [AdminCourseCatalogController::class, 'uploadImage'])->name('api.v1.admin.course-catalog.upload-image');
+                Route::get('available-images', [AdminCourseCatalogController::class, 'availableImages'])->name('api.v1.admin.course-catalog.available-images');
                 Route::get('{id}', [AdminCourseCatalogController::class, 'show'])->name('api.v1.admin.course-catalog.show');
                 Route::put('{id}', [AdminCourseCatalogController::class, 'update'])->name('api.v1.admin.course-catalog.update');
                 Route::delete('{id}', [AdminCourseCatalogController::class, 'destroy'])->name('api.v1.admin.course-catalog.destroy');
